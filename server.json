@@ -2,7 +2,7 @@
   "$schema": "https://static.modelcontextprotocol.io/schemas/2025-12-11/server.schema.json",
   "name": "io.github.lineofflight/frankfurter",
   "title": "Frankfurter",
-  "description": "Blended exchange rates from the Frankfurter API, aggregated across 50+ central banks and institutions. Tools: get_rates (latest, historical, and time series) and convert.",
+  "description": "Blended exchange rates from 50+ institutions via Frankfurter. Tools: get_rates, convert.",
   "repository": {
     "url": "https://github.com/lineofflight/frankfurter-mcp",
     "source": "github"
