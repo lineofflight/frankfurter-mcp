@@ -17,6 +17,7 @@ test("converts amount using fetched rate, rounded to target currency", async () 
     rate: 0.92137,
     date: "2024-01-15",
     result: 92.14,
+    rounded: true,
   });
 });
 
@@ -25,6 +26,7 @@ test("same currency short-circuits to rate 1", async () => {
   const out = await runConvert({ amount: 50, from: "USD", to: "USD" }, client);
   expect(out.rate).toBe(1);
   expect(out.result).toBe(50);
+  expect(out.rounded).toBe(true);
   expect(client.getRates).not.toHaveBeenCalled();
 });
 
@@ -48,4 +50,5 @@ test("converting into a metal returns the raw unrounded product", async () => {
   const out = await runConvert({ amount: 2, from: "USD", to: "XAU" }, client);
   expect(out.result).toBe(2 * 0.000414);
   expect(out.rate).toBe(0.000414);
+  expect(out.rounded).toBe(false);
 });

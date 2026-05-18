@@ -26,6 +26,7 @@ export interface ConvertResult {
   rate: number;
   date: string;
   result: number;
+  rounded: boolean;
 }
 
 export async function runConvert(
@@ -44,6 +45,8 @@ export async function runConvert(
       // No upstream record to echo for an identity conversion; use the server's current UTC date.
       date: args.date ?? new Date().toISOString().slice(0, 10),
       result: args.amount,
+      // Identity conversion is exact: no FX math, no precision guessing.
+      rounded: true,
     };
   }
 
@@ -52,7 +55,7 @@ export async function runConvert(
   if (!record) {
     throw new Error(`No rate available for ${from}->${to}${args.date ? ` on ${args.date}` : ""}.`);
   }
-  const { value } = roundToCurrency(args.amount * record.rate, to);
+  const { value, rounded } = roundToCurrency(args.amount * record.rate, to);
   return {
     amount: args.amount,
     from,
@@ -60,6 +63,7 @@ export async function runConvert(
     rate: record.rate,
     date: record.date,
     result: value,
+    rounded,
   };
 }
 
