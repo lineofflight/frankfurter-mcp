@@ -1,0 +1,4 @@
+[
+  { "date": "2024-01-15", "base": "EUR", "quote": "USD", "rate": 1.0876 },
+  { "date": "2024-01-15", "base": "EUR", "quote": "GBP", "rate": 0.8567 }
+]
