@@ -18,9 +18,13 @@ jobs:
       - run: npm run lint
       - run: npm test
 
+  # First-time GHCR publish under the org requires a one-time org setting to
+  # permit Actions to create the package. Until that is enabled, this job is
+  # best-effort and allowed to fail; the test job is the real gate.
   image:
     needs: test
     if: github.ref == 'refs/heads/main'
+    continue-on-error: true
     runs-on: ubuntu-latest
     permissions:
       contents: read

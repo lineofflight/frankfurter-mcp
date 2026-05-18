@@ -24,8 +24,12 @@ npm start            # listens on :3000, POST /mcp
 Docker:
 
 ```bash
+docker build -t frankfurter-mcp . && docker run -p 3000:3000 frankfurter-mcp
 docker run -p 3000:3000 ghcr.io/lineofflight/frankfurter-mcp:latest
 ```
+
+The prebuilt `ghcr.io/lineofflight/frankfurter-mcp` image is available once
+package publishing is enabled for the repo; building from source always works.
 
 Point any MCP client at `http://<host>:3000/mcp` (Streamable HTTP).
 
