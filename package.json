@@ -1,12 +1,16 @@
 {
   "name": "frankfurter-mcp",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "private": true,
   "description": "Official MCP server for the Frankfurter exchange-rate API",
   "license": "MIT",
   "type": "module",
-  "engines": { "node": ">=22" },
-  "bin": { "frankfurter-mcp": "dist/index.js" },
+  "engines": {
+    "node": ">=22"
+  },
+  "bin": {
+    "frankfurter-mcp": "dist/index.js"
+  },
   "scripts": {
     "build": "tsc -p tsconfig.json",
     "start": "node dist/index.js",
