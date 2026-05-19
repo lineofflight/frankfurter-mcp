@@ -9,12 +9,12 @@ export function createApp(): Express {
     res.json({ ok: true });
   });
 
-  // Note: no body-parser on /mcp. On @modelcontextprotocol/sdk >=1.13 the
-  // Streamable HTTP server transport reads the raw request stream itself (via
-  // its Hono-based web-standard adapter). Pre-parsing the body with
+  // Note: no body-parser on the MCP route. On @modelcontextprotocol/sdk >=1.13
+  // the Streamable HTTP server transport reads the raw request stream itself
+  // (via its Hono-based web-standard adapter). Pre-parsing the body with
   // express.json() drains that stream and the request hangs, so the transport
   // owns body parsing for this route.
-  app.post("/mcp", async (req, res) => {
+  app.post("/", async (req, res) => {
     const server = createMcpServer();
     const transport = new StreamableHTTPServerTransport({
       sessionIdGenerator: undefined,
@@ -33,8 +33,8 @@ export function createApp(): Express {
       .status(405)
       .json({ jsonrpc: "2.0", error: { code: -32000, message: "Method not allowed." }, id: null });
   };
-  app.get("/mcp", methodNotAllowed);
-  app.delete("/mcp", methodNotAllowed);
+  app.get("/", methodNotAllowed);
+  app.delete("/", methodNotAllowed);
 
   return app;
 }

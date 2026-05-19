@@ -18,7 +18,7 @@ Rates are daily reference rates, not real-time trading rates. Not financial advi
 ```bash
 npm install
 npm run build
-npm start            # listens on :3000, POST /mcp
+npm start            # listens on :3000, POST /
 ```
 
 Docker:
@@ -28,10 +28,11 @@ docker build -t frankfurter-mcp . && docker run -p 3000:3000 frankfurter-mcp
 docker run -p 3000:3000 ghcr.io/lineofflight/frankfurter-mcp:latest
 ```
 
-The prebuilt `ghcr.io/lineofflight/frankfurter-mcp` image is available once
-package publishing is enabled for the repo; building from source always works.
+The prebuilt `ghcr.io/lineofflight/frankfurter-mcp:latest` image is published
+on each release; building from source also works.
 
-Point any MCP client at `http://<host>:3000/mcp` (Streamable HTTP).
+Point any MCP client at `http://<host>:3000/` (Streamable HTTP). The hosted
+server is at `https://mcp.frankfurter.dev/`.
 
 ## Configuration
 

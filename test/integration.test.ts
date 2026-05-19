@@ -31,7 +31,7 @@ afterAll(() => {
 });
 
 test("MCP client can call get_rates over HTTP", async () => {
-  const transport = new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/mcp`));
+  const transport = new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/`));
   const client = new Client({ name: "it", version: "0" });
   await client.connect(transport);
 
