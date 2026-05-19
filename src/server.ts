@@ -13,10 +13,7 @@ const { version } = JSON.parse(
 ) as { version: string };
 
 export function createMcpServer(client: FrankfurterClient = new FrankfurterClient()): McpServer {
-  const server = new McpServer(
-    { name: "frankfurter", version },
-    { instructions: INSTRUCTIONS },
-  );
+  const server = new McpServer({ name: "frankfurter", version }, { instructions: INSTRUCTIONS });
   registerGetRates(server, client);
   registerConvert(server, client);
   return server;
