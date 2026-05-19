@@ -1,20 +1,16 @@
-export function roundToCurrency(
-  value: number,
-  currency: string,
-): { value: number; rounded: boolean } {
-  try {
-    // Intl.NumberFormat does not throw for well-formed-but-unknown codes (e.g.
-    // "ZZZ") on current Node; it silently defaults to 2 digits. Gate on the
-    // ISO 4217 set so unknown codes return unrounded rather than guessing.
-    if (!Intl.supportedValuesOf("currency").includes(currency.toUpperCase())) {
-      return { value, rounded: false };
-    }
+// Known ISO 4217 currency: round to its minor units (USD 2, JPY 0, BHD 3).
+// Unknown / no minor unit (precious metals XAU/XAG/XPT/XPD): round to 8
+// significant figures. Magnitude-independent (a tiny metal amount like
+// 0.00022345 keeps precision; a large one is trimmed sanely) and clamps
+// IEEE-754 float noise (0.022000000000000002 -> 0.022). No false precision.
+export function roundMoney(value: number, currency: string): number {
+  const code = currency.toUpperCase();
+  if (Intl.supportedValuesOf("currency").includes(code)) {
     const digits =
-      new Intl.NumberFormat("en", { style: "currency", currency }).resolvedOptions()
+      new Intl.NumberFormat("en", { style: "currency", currency: code }).resolvedOptions()
         .maximumFractionDigits ?? 2;
     const factor = 10 ** digits;
-    return { value: Math.round(value * factor) / factor, rounded: true };
-  } catch {
-    return { value, rounded: false };
+    return Math.round(value * factor) / factor;
   }
+  return Number(value.toPrecision(8));
 }

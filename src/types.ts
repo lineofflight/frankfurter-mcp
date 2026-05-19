@@ -5,6 +5,11 @@ export interface RateRecord {
   rate: number;
 }
 
+export interface Provider {
+  key: string;
+  name: string;
+}
+
 export interface GetRatesParams {
   base?: string;
   date?: string;

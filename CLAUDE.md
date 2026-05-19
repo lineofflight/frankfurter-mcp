@@ -26,8 +26,9 @@ src/
   tools/
     getRates.ts     # get_rates: schema + validation + handler
     convert.ts      # convert: schema + arithmetic + handler
+    listProviders.ts # list_providers: lists data sources
   instructions.ts   # server-level MCP instructions string
-  rounding.ts       # currency-aware rounding (unknown precision -> unrounded)
+  rounding.ts       # money rounding: ISO minor units / 8 sig-figs for metals
   types.ts          # shared types
 test/               # Vitest specs (unit, server, integration, version, live smoke)
 scripts/
@@ -37,12 +38,15 @@ server.json         # MCP registry manifest (remote server, root URL)
 
 ## Tools
 
-- `get_rates` — blended rates. No date = latest; `date` = that day;
+- `get_rates` — blended reference rates. No date = latest; `date` = that day;
   `start`+`end` = time series (requires `quotes`). Optional `base`, `quotes`,
-  `providers`.
-- `convert` — convert an amount between two currencies; returns the rate used.
-  Unknown-precision targets (e.g. precious metals) return the unrounded result
-  with `rounded: false`.
+  and `provider` (single source key; omit for blended consensus).
+- `convert` — convert an amount between two currencies. Returns a money object
+  `{ amount, currency }` and nothing else; pass `date` for a historical rate.
+  Rounded to the target's ISO minor units, or 8 significant figures for
+  metals/unknown-precision codes.
+- `list_providers` — the available data sources as `{ key, name }`; use a key
+  with `get_rates`' `provider` filter.
 
 ## Commands
 

@@ -1,4 +1,4 @@
-import type { GetRatesParams, RateRecord } from "./types.js";
+import type { GetRatesParams, Provider, RateRecord } from "./types.js";
 
 const DEFAULT_BASE_URL = "https://api.frankfurter.dev";
 
@@ -24,5 +24,16 @@ export class FrankfurterClient {
       throw new Error(`Frankfurter API ${res.status}: ${body.slice(0, 200)}`);
     }
     return (await res.json()) as RateRecord[];
+  }
+
+  async getProviders(): Promise<Provider[]> {
+    const url = new URL("/v2/providers", this.baseUrl);
+    const res = await fetch(url, { headers: { accept: "application/json" } });
+    if (!res.ok) {
+      const body = await res.text();
+      throw new Error(`Frankfurter API ${res.status}: ${body.slice(0, 200)}`);
+    }
+    const data = (await res.json()) as Array<{ key: string; name: string }>;
+    return data.map(({ key, name }) => ({ key, name }));
   }
 }

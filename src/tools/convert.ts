@@ -1,15 +1,19 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { z } from "zod";
 import type { FrankfurterClient } from "../frankfurter.js";
-import { roundToCurrency } from "../rounding.js";
+import { roundMoney } from "../rounding.js";
 
 const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "expected YYYY-MM-DD");
 
 export const convertShape = {
-  amount: z.number().describe("Amount in the source currency."),
+  amount: z
+    .number()
+    .describe(
+      "Amount in the source currency, as a number with a period decimal separator (e.g. 100.50). Normalize localized input first: '100,50' -> 100.5; German '1.000,50' -> 1000.5; English '1,000.50' -> 1000.5.",
+    ),
   from: z.string().length(3).describe("ISO 4217 source currency."),
   to: z.string().length(3).describe("ISO 4217 target currency."),
-  date: DATE.optional().describe("Historical date YYYY-MM-DD. Omit for latest."),
+  date: DATE.optional().describe("Historical date YYYY-MM-DD for a past rate. Omit for latest."),
 };
 
 export interface ConvertArgs {
@@ -19,14 +23,11 @@ export interface ConvertArgs {
   date?: string;
 }
 
+// A money object: the converted value and its currency. Nothing else — for the
+// rate, date, or provenance, use get_rates.
 export interface ConvertResult {
   amount: number;
-  from: string;
-  to: string;
-  rate: number;
-  date: string;
-  result: number;
-  rounded: boolean;
+  currency: string;
 }
 
 export async function runConvert(
@@ -37,17 +38,7 @@ export async function runConvert(
   const to = args.to.toUpperCase();
 
   if (from === to) {
-    return {
-      amount: args.amount,
-      from,
-      to,
-      rate: 1,
-      // No upstream record to echo for an identity conversion; use the server's current UTC date.
-      date: args.date ?? new Date().toISOString().slice(0, 10),
-      result: args.amount,
-      // Identity conversion is exact: no FX math, no precision guessing.
-      rounded: true,
-    };
+    return { amount: roundMoney(args.amount, to), currency: to };
   }
 
   const records = await client.getRates({ base: from, quotes: [to], date: args.date });
@@ -55,16 +46,7 @@ export async function runConvert(
   if (!record) {
     throw new Error(`No rate available for ${from}->${to}${args.date ? ` on ${args.date}` : ""}.`);
   }
-  const { value, rounded } = roundToCurrency(args.amount * record.rate, to);
-  return {
-    amount: args.amount,
-    from,
-    to,
-    rate: record.rate,
-    date: record.date,
-    result: value,
-    rounded,
-  };
+  return { amount: roundMoney(args.amount * record.rate, to), currency: to };
 }
 
 export function registerConvert(server: McpServer, client: FrankfurterClient): void {
@@ -72,7 +54,7 @@ export function registerConvert(server: McpServer, client: FrankfurterClient): v
     "convert",
     {
       description:
-        "Convert an amount between two currencies using Frankfurter's blended rate. Returns the rate used for transparency.",
+        "Convert an amount from one currency to another using Frankfurter's blended reference rate. Returns a money object {amount, currency}. Pass `date` for a historical rate.",
       inputSchema: convertShape,
     },
     async (args: ConvertArgs) => {

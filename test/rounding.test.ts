@@ -1,18 +1,17 @@
 import { expect, test } from "vitest";
-import { roundToCurrency } from "../src/rounding.js";
+import { roundMoney } from "../src/rounding.js";
 
-test("rounds USD to 2 decimals", () => {
-  expect(roundToCurrency(12.3456, "USD")).toEqual({ value: 12.35, rounded: true });
+test("rounds known currencies to their ISO minor units", () => {
+  expect(roundMoney(12.3456, "USD")).toBe(12.35);
+  expect(roundMoney(1234.56, "JPY")).toBe(1235);
+  expect(roundMoney(1.23456, "BHD")).toBe(1.235);
 });
 
-test("rounds JPY to 0 decimals", () => {
-  expect(roundToCurrency(1234.56, "JPY")).toEqual({ value: 1235, rounded: true });
+test("metal/unknown: 8 significant figures, clamps float noise", () => {
+  expect(roundMoney(0.022000000000000002, "XAU")).toBe(0.022);
 });
 
-test("rounds BHD to 3 decimals", () => {
-  expect(roundToCurrency(1.23456, "BHD")).toEqual({ value: 1.235, rounded: true });
-});
-
-test("unknown currency returns unrounded, rounded=false", () => {
-  expect(roundToCurrency(1.23456, "ZZZ")).toEqual({ value: 1.23456, rounded: false });
+test("metal/unknown: preserves precision across magnitudes", () => {
+  expect(roundMoney(0.00022345678, "XAU")).toBe(0.00022345678);
+  expect(roundMoney(3012.3456789, "XAU")).toBe(3012.3457);
 });

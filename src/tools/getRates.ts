@@ -13,7 +13,12 @@ export const getRatesShape = {
     .array(z.string().length(3))
     .optional()
     .describe("ISO 4217 quote codes. Required when start/end is set."),
-  providers: z.array(z.string()).optional().describe("Provider keys. Omit for blended (default)."),
+  provider: z
+    .string()
+    .optional()
+    .describe(
+      "Single data-provider key to use exclusively (e.g. ECB). Omit for blended consensus across all sources. Call list_providers for valid keys.",
+    ),
 };
 
 export interface GetRatesArgs {
@@ -22,7 +27,7 @@ export interface GetRatesArgs {
   start?: string;
   end?: string;
   quotes?: string[];
-  providers?: string[];
+  provider?: string;
 }
 
 export function validateGetRates(a: GetRatesArgs): string | null {
@@ -44,7 +49,7 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
     "get_rates",
     {
       description:
-        "Blended multi-source reference exchange rates. No date = latest; `date` = that day; `start`+`end` = time series (requires `quotes`).",
+        "Blended multi-source reference exchange rates. No date = latest; `date` = that day; `start`+`end` = time series (requires `quotes`). Optional `provider` returns a single source instead of the blend.",
       inputSchema: getRatesShape,
     },
     async (args: GetRatesArgs) => {
@@ -59,7 +64,7 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
           from: args.start,
           to: args.end,
           quotes: args.quotes,
-          providers: args.providers,
+          providers: args.provider ? [args.provider] : undefined,
         });
         return { content: [{ type: "text" as const, text: JSON.stringify(records, null, 2) }] };
       } catch (e) {
