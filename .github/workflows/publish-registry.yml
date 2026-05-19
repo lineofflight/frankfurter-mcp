@@ -1,0 +1,32 @@
+name: Publish to MCP Registry
+
+# Publishes server.json to the official MCP Registry using GitHub Actions OIDC
+# (no interactive login, no expiring token). The OIDC token proves the workflow
+# runs in this repo under the lineofflight org, which authorizes the
+# io.github.lineofflight/* namespace. Runs on server.json changes (version /
+# URL bumps) and on manual dispatch.
+
+on:
+  push:
+    branches: [main]
+    paths: ["server.json"]
+  workflow_dispatch:
+
+permissions:
+  contents: read
+  id-token: write
+
+jobs:
+  publish:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - name: Install mcp-publisher
+        run: |
+          curl -L "https://github.com/modelcontextprotocol/registry/releases/latest/download/mcp-publisher_$(uname -s | tr '[:upper:]' '[:lower:]')_$(uname -m | sed 's/x86_64/amd64/;s/aarch64/arm64/').tar.gz" | tar xz mcp-publisher
+      - name: Validate server.json
+        run: ./mcp-publisher validate
+      - name: Authenticate (GitHub OIDC)
+        run: ./mcp-publisher login github-oidc
+      - name: Publish
+        run: ./mcp-publisher publish
