@@ -44,7 +44,7 @@ test("serializes all params to v2 query", async () => {
 
 test("maps from/to for ranges", async () => {
   const c = new FrankfurterClient(BASE);
-  await c.getRates({ from: "2024-01-01", to: "2024-01-02", quotes: ["USD"] });
+  await c.getRates({ start: "2024-01-01", end: "2024-01-02", quotes: ["USD"] });
   const u = new URL(lastUrl);
   expect(u.searchParams.get("from")).toBe("2024-01-01");
   expect(u.searchParams.get("to")).toBe("2024-01-02");

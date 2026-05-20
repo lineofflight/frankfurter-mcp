@@ -61,8 +61,8 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
         const records = await client.getRates({
           base: args.base,
           date: args.date,
-          from: args.start,
-          to: args.end,
+          start: args.start,
+          end: args.end,
           quotes: args.quotes,
           providers: args.provider ? [args.provider] : undefined,
         });

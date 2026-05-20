@@ -62,9 +62,9 @@ repeated identical lookups are genuinely cache-served.
 
 ## Tools
 
-Two tools. A singular `get_rate` is deliberately omitted: a single-pair lookup
-is `get_rates` reading one quote, and `convert` returns the rate explicitly. No
-seventh use case would justify a third tool.
+Four tools. A singular `get_rate` is deliberately omitted: a single-pair lookup
+is `get_rates` reading one quote, and `convert` returns the result explicitly. No
+use case would justify a fifth tool.
 
 ### `get_rates`
 
@@ -105,15 +105,22 @@ maintain a local currency list; it surfaces the API's errors cleanly.
 
 Behavior: fetch the `from`→`to` rate (latest or for `date`), compute
 `amount × rate`, round to the target currency's minor unit, and return
-`{ amount, from, to, rate, date, result }`. The rate used is always included
-so the arithmetic is transparent.
+a money object `{ amount, currency }`. 
 
 It is intentionally thin (`rate × amount`). Its justification is determinism
 (LLMs slip on money math), currency-aware rounding, and transparency.
+Introspection on the rate used is available via `get_rates`.
 
 Minor-unit precision comes from a standard ISO 4217 source in the TS ecosystem.
 If a code's precision is unknown, return the unrounded result alongside the
 rate rather than guessing — transparency over false precision.
+
+### `list_currencies`
+
+List supported ISO 4217 currency codes and their full names as a compact
+`{ code: name }` object. No parameters. Allows agents to verify currency support
+before a conversion or rate lookup without returning the API's fuller currency
+metadata.
 
 ## Data flow and errors
 
@@ -144,8 +151,7 @@ Public code, private deployment details.
 ## Out of scope (YAGNI)
 
 - npm/stdio distribution (transport-decoupled so it is a cheap later add).
-- `list_currencies` / `list_providers` tools (models know ISO 4217; provenance
-  is the optional `providers` param plus server `instructions`).
+- Rich currency/provider metadata tools; keep discovery outputs compact.
 - Resources and prompts.
 - Auth (data is public).
 - An MCP-side cache (the CDN handles it).

@@ -26,6 +26,7 @@ src/
   tools/
     getRates.ts     # get_rates: schema + validation + handler
     convert.ts      # convert: schema + arithmetic + handler
+    listCurrencies.ts # list_currencies: lists supported currency codes/names
     listProviders.ts # list_providers: lists data sources
   instructions.ts   # server-level MCP instructions string
   rounding.ts       # money rounding: ISO minor units / 8 sig-figs for metals
@@ -45,6 +46,8 @@ server.json         # MCP registry manifest (remote server, root URL)
   `{ amount, currency }` and nothing else; pass `date` for a historical rate.
   Rounded to the target's ISO minor units, or 8 significant figures for
   metals/unknown-precision codes.
+- `list_currencies` — supported ISO 4217 currency codes and names as
+  `{ code: name }`.
 - `list_providers` — the available data sources as `{ key, name }`; use a key
   with `get_rates`' `provider` filter.
 

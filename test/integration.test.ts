@@ -16,7 +16,10 @@ let httpServer: Server;
 let port: number;
 
 beforeAll(async () => {
-  vi.spyOn(FrankfurterClient.prototype, "getRates").mockResolvedValue(latest);
+  vi.spyOn(FrankfurterClient.prototype, "getRates").mockImplementation(async () => {
+    await new Promise((resolve) => setTimeout(resolve, 25));
+    return latest;
+  });
   const { createApp } = await import("../src/index.js");
   await new Promise<void>((resolve) => {
     httpServer = createApp().listen(0, () => {
@@ -30,14 +33,30 @@ afterAll(() => {
   vi.restoreAllMocks();
 });
 
-test("MCP client can call get_rates over HTTP", async () => {
+async function callGetRatesOverHttp(clientName: string): Promise<unknown> {
   const transport = new StreamableHTTPClientTransport(new URL(`http://127.0.0.1:${port}/`));
-  const client = new Client({ name: "it", version: "0" });
-  await client.connect(transport);
+  const client = new Client({ name: clientName, version: "0" });
+  let connected = false;
 
-  const res = await client.callTool({ name: "get_rates", arguments: {} });
-  const text = (res.content as Array<{ type: string; text: string }>)[0].text;
-  expect(JSON.parse(text)).toEqual(latest);
+  try {
+    await client.connect(transport);
+    connected = true;
+    const res = await client.callTool({ name: "get_rates", arguments: {} });
+    const text = (res.content as Array<{ type: string; text: string }>)[0].text;
+    return JSON.parse(text);
+  } finally {
+    if (connected) {
+      await transport.close();
+    }
+  }
+}
 
-  await transport.close();
+test("MCP client can call get_rates over HTTP", async () => {
+  expect(await callGetRatesOverHttp("it")).toEqual(latest);
+});
+
+test("concurrent MCP clients can call get_rates over HTTP", async () => {
+  await expect(
+    Promise.all([callGetRatesOverHttp("it-1"), callGetRatesOverHttp("it-2")]),
+  ).resolves.toEqual([latest, latest]);
 });

@@ -11,6 +11,7 @@ over Frankfurter's v2 blended multi-source reference rates.
   `quotes`, `provider` (single source; omit for blended).
 - **`convert`** — convert an amount; returns a money object `{ amount, currency }`.
   Pass `date` for a historical rate.
+- **`list_currencies`** — supported ISO 4217 codes and names as `{ code: name }`.
 - **`list_providers`** — available data sources as `{ key, name }`.
 
 Rates are daily reference rates, not real-time trading rates. Not financial advice.
