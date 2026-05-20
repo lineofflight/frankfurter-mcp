@@ -54,7 +54,7 @@ export function registerConvert(server: McpServer, client: FrankfurterClient): v
     "convert",
     {
       description:
-        "Convert an amount from one currency to another using Frankfurter's blended reference rate. Returns a money object {amount, currency}. Pass `date` for a historical rate.",
+        "Convert an amount from one currency to another. Returns {amount, currency} rounded to the target's minor units. Pass `date` for a historical rate. Upstream rounds rates per direction; for low-value sources, flip via `get_rates` for more precision.",
       inputSchema: convertShape,
     },
     async (args: ConvertArgs) => {

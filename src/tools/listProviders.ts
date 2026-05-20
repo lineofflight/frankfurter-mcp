@@ -6,7 +6,7 @@ export function registerListProviders(server: McpServer, client: FrankfurterClie
     "list_providers",
     {
       description:
-        "List the available data providers (institutional sources) as {key, name}. Use a key with get_rates' `provider` filter to restrict to a single source.",
+        "List the available data providers (institutional sources) as {key, name}. Use a key with get_rates' `provider` filter to restrict to a single source. Coverage varies; missing pairs are cross-derived.",
       inputSchema: {},
     },
     async () => {

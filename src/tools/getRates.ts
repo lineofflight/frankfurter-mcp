@@ -49,7 +49,7 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
     "get_rates",
     {
       description:
-        "Blended multi-source reference exchange rates. No date = latest; `date` = that day; `start`+`end` = time series (requires `quotes`). Optional `provider` returns a single source instead of the blend.",
+        "Blended multi-source reference exchange rates. No date = latest; `date` = that day; `start`+`end` = time series (requires `quotes`). Optional `provider` returns a single source instead of the blend. Non-native bases are cross-derived from each provider's published pairs.",
       inputSchema: getRatesShape,
     },
     async (args: GetRatesArgs) => {
