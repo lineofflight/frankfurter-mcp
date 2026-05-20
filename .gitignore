@@ -6,8 +6,6 @@ coverage
 .vitest
 *.tsbuildinfo
 
-# Private deploy — mirror the frankfurter repo: topology stays local, never committed
 .env
 .env.*
 .envrc
-.agents/skills/deploying/
