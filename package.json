@@ -1,6 +1,6 @@
 {
   "name": "frankfurter-mcp",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "private": true,
   "description": "Official MCP server for the Frankfurter exchange-rate API",
   "license": "MIT",
