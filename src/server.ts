@@ -5,7 +5,6 @@ import { INSTRUCTIONS } from "./instructions.js";
 import { registerConvert } from "./tools/convert.js";
 import { registerGetRates } from "./tools/getRates.js";
 import { registerListCurrencies } from "./tools/listCurrencies.js";
-import { registerListProviders } from "./tools/listProviders.js";
 
 // Single source of truth: serverInfo.version mirrors package.json so it can
 // never drift from the released/registry version. package.json sits one
@@ -19,6 +18,5 @@ export function createMcpServer(client: FrankfurterClient = new FrankfurterClien
   registerGetRates(server, client);
   registerConvert(server, client);
   registerListCurrencies(server, client);
-  registerListProviders(server, client);
   return server;
 }

@@ -5,11 +5,6 @@ export interface RateRecord {
   rate: number;
 }
 
-export interface Provider {
-  key: string;
-  name: string;
-}
-
 export interface Currency {
   iso_code: string;
   name: string;
