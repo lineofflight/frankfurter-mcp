@@ -3,6 +3,7 @@ name: CI
 on:
   push:
     branches: [main]
+    tags: ["v*"]
   pull_request:
 
 jobs:
@@ -43,3 +44,45 @@ jobs:
           tags: |
             ghcr.io/lineofflight/frankfurter-mcp:latest
             ghcr.io/lineofflight/frankfurter-mcp:${{ github.sha }}
+
+  # Create a GitHub Release on each v* tag, with notes pulled from CHANGELOG.md.
+  # Mirrors the parent Frankfurter project's release job.
+  release:
+    needs: test
+    if: startsWith(github.ref, 'refs/tags/v')
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/checkout@v4
+      - name: Extract version from tag
+        id: extract_version
+        run: |
+          echo "version=${GITHUB_REF#refs/tags/}" >> "$GITHUB_OUTPUT"
+          echo "version_number=${GITHUB_REF#refs/tags/v}" >> "$GITHUB_OUTPUT"
+      - name: Check if prerelease
+        id: prerelease
+        run: |
+          VERSION="${GITHUB_REF#refs/tags/v}"
+          if [[ "$VERSION" == *-* ]]; then
+            echo "is_prerelease=true" >> "$GITHUB_OUTPUT"
+          else
+            echo "is_prerelease=false" >> "$GITHUB_OUTPUT"
+          fi
+      - name: Extract changelog entry
+        run: |
+          VERSION_NUMBER="${{ steps.extract_version.outputs.version_number }}"
+          awk "/^## \[$VERSION_NUMBER\]/{flag=1;next}/^## \[/{flag=0}flag" CHANGELOG.md > release_notes.md
+          if [ -s release_notes.md ]; then
+            echo "Found changelog entry for $VERSION_NUMBER"
+          else
+            echo "Release ${{ steps.extract_version.outputs.version }}" > release_notes.md
+          fi
+      - name: Create GitHub Release
+        uses: softprops/action-gh-release@v3
+        with:
+          tag_name: ${{ steps.extract_version.outputs.version }}
+          name: ${{ steps.extract_version.outputs.version }}
+          body_path: release_notes.md
+          draft: false
+          prerelease: ${{ steps.prerelease.outputs.is_prerelease == 'true' }}
