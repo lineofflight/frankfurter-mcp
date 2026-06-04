@@ -24,10 +24,9 @@ src/
   server.ts         # createMcpServer(): assembles McpServer; reads version from package.json
   frankfurter.ts    # FrankfurterClient: the only outbound boundary (v2 API)
   tools/
-    getRates.ts     # get_rates: schema + validation + handler
-    convert.ts      # convert: schema + arithmetic + handler
+    convert.ts      # convert: schema + arithmetic + handler (primary tool)
+    getRates.ts     # get_rates: schema + handler (latest / single-date snapshot)
     listCurrencies.ts # list_currencies: lists supported currency codes/names
-    listProviders.ts # list_providers: lists data sources
   instructions.ts   # server-level MCP instructions string
   rounding.ts       # money rounding: ISO minor units / 8 sig-figs for metals
   types.ts          # shared types
@@ -39,17 +38,17 @@ server.json         # MCP registry manifest (remote server, root URL)
 
 ## Tools
 
-- `get_rates` — blended reference rates. No date = latest; `date` = that day;
-  `start`+`end` = time series (requires `quotes`). Optional `base`, `quotes`,
-  and `provider` (single source key; omit for blended consensus).
-- `convert` — convert an amount between two currencies. Returns a money object
-  `{ amount, currency }` and nothing else; pass `date` for a historical rate.
-  Rounded to the target's ISO minor units, or 8 significant figures for
-  metals/unknown-precision codes.
+- `convert` — the primary tool. Convert an amount between two currencies.
+  Returns a money object `{ amount, currency }` and nothing else; pass `date`
+  for a historical rate. Rounded to the target's ISO minor units, or 8
+  significant figures for metals/unknown-precision codes.
+- `get_rates` — blended reference rates for the latest day or a single `date`.
+  Optional `base` and `quotes`. The raw-rate companion behind a conversion.
 - `list_currencies` — supported ISO 4217 currency codes and names as
   `{ code: name }`.
-- `list_providers` — the available data sources as `{ key, name }`; use a key
-  with `get_rates`' `provider` filter.
+
+For time series, historical ranges, provider-specific rates, or bulk queries,
+use the REST API at `https://api.frankfurter.dev/v2` directly.
 
 ## Commands
 
