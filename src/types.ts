@@ -17,8 +17,5 @@ export interface Currency {
 export interface GetRatesParams {
   base?: string;
   date?: string;
-  start?: string;
-  end?: string;
   quotes?: string[];
-  providers?: string[];
 }

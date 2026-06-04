@@ -27,27 +27,13 @@ test("fetches latest rates", async () => {
   expect(out).toEqual(latest);
 });
 
-test("serializes all params to v2 query", async () => {
+test("serializes base/date/quotes to v2 query", async () => {
   const c = new FrankfurterClient(BASE);
-  await c.getRates({
-    base: "USD",
-    date: "2024-03-15",
-    quotes: ["EUR", "GBP"],
-    providers: ["ecb", "tcmb"],
-  });
+  await c.getRates({ base: "USD", date: "2024-03-15", quotes: ["EUR", "GBP"] });
   const u = new URL(lastUrl);
   expect(u.searchParams.get("base")).toBe("USD");
   expect(u.searchParams.get("date")).toBe("2024-03-15");
   expect(u.searchParams.get("quotes")).toBe("EUR,GBP");
-  expect(u.searchParams.get("providers")).toBe("ecb,tcmb");
-});
-
-test("maps from/to for ranges", async () => {
-  const c = new FrankfurterClient(BASE);
-  await c.getRates({ start: "2024-01-01", end: "2024-01-02", quotes: ["USD"] });
-  const u = new URL(lastUrl);
-  expect(u.searchParams.get("from")).toBe("2024-01-01");
-  expect(u.searchParams.get("to")).toBe("2024-01-02");
 });
 
 test("throws with status and body on non-2xx", async () => {

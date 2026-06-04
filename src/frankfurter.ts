@@ -13,10 +13,7 @@ export class FrankfurterClient {
     const url = new URL("/v2/rates", this.baseUrl);
     if (params.base) url.searchParams.set("base", params.base);
     if (params.date) url.searchParams.set("date", params.date);
-    if (params.start) url.searchParams.set("from", params.start);
-    if (params.end) url.searchParams.set("to", params.end);
     if (params.quotes?.length) url.searchParams.set("quotes", params.quotes.join(","));
-    if (params.providers?.length) url.searchParams.set("providers", params.providers.join(","));
 
     const res = await fetch(url, { headers: { accept: "application/json" } });
     if (!res.ok) {
