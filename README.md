@@ -6,13 +6,15 @@ over Frankfurter's v2 blended multi-source reference rates.
 
 ## Tools
 
-- **`get_rates`** — blended reference rates. No date = latest; `date` = that
-  day; `start`+`end` = time series (requires `quotes`). Optional `base`,
-  `quotes`, `provider` (single source; omit for blended).
-- **`convert`** — convert an amount; returns a money object `{ amount, currency }`.
-  Pass `date` for a historical rate.
+- **`convert`** — the primary tool. Convert an amount between two currencies;
+  returns a money object `{ amount, currency }` rounded to the target's minor
+  units. Pass `date` for a historical rate.
+- **`get_rates`** — blended reference rates for the latest day or a single
+  `date`. Optional `base` and `quotes`. The raw-rate companion to `convert`.
 - **`list_currencies`** — supported ISO 4217 codes and names as `{ code: name }`.
-- **`list_providers`** — available data sources as `{ key, name }`.
+
+For time series, historical ranges, provider-specific rates, or bulk queries,
+use the REST API at `https://api.frankfurter.dev/v2` directly.
 
 Rates are daily reference rates, not real-time trading rates. Not financial advice.
 
