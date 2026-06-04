@@ -97,25 +97,6 @@ must be ≤ 100 characters or the registry rejects it.
 `.github/workflows/ci.yml` runs the test suite and publishes the Docker image
 to `ghcr.io/lineofflight/frankfurter-mcp` on push.
 
-## Deployment and secrets
-
-Mirror the upstream Frankfurter project's convention: **the public repo
-contains only generic code and a `Dockerfile`. All deployment topology — host,
-ports, origin, CDN/routing — lives in the gitignored local deploy runbook at
-`.agents/skills/deploying/` and gitignored `.env`/`.envrc`. Never commit host
-names, IPs, routing, or credentials to this repo** (it is public).
-
-- The server runs as a Docker container (`ghcr.io/lineofflight/frankfurter-mcp:latest`)
-  behind a CDN; it serves MCP at the root path.
-- **No credentials are required for normal development or for registry
-  publishing** (OIDC handles publish). Routing (DNS + origin mapping for the
-  public hostname) is a one-time, already-provisioned setup; normal operation
-  needs no recurring CDN/API action.
-- If a future change ever needs infrastructure API access (e.g. a CDN token)
-  or host access (SSH), those credentials live only in the gitignored local
-  env or the local runbook — same pattern as the parent project — never in a
-  committed file.
-
 ## Development Notes
 
 - Strict TypeScript; Biome (2-space, double quotes, 100-col)
