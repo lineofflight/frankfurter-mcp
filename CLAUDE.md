@@ -75,8 +75,13 @@ version anywhere else:
   (`scripts/sync-server-json-version.mjs`).
 - `test/version.test.ts` fails if `server.json` and `package.json` ever drift.
 
-To release a new version, run **`npm version patch|minor|major`** — this bumps
+To release a new version: first add a `## [x.y.z]` section to `CHANGELOG.md` for
+the new version, then run **`npm version patch|minor|major`** — this bumps
 `package.json`, syncs `server.json`, and tags. Do not edit versions manually.
+Pushing the tag triggers the `release` job in CI, which builds the GitHub
+Release from that `CHANGELOG.md` section — and it reads the file *at the tagged
+commit*, so the entry must be committed before `npm version` creates the tag (a
+missing entry falls back to a generic "Release vX.Y.Z" note).
 
 ## Release / MCP Registry
 
