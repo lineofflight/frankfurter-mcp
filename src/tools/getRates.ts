@@ -23,8 +23,7 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
   server.registerTool(
     "get_rates",
     {
-      description:
-        "Latest or a single day's blended multi-source reference exchange rates. No date = latest; `date` = that day. Optional `base` and `quotes`. The raw-rate companion to `convert`. For a time series, a historical range, or a single provider's rates, call the REST API at https://api.frankfurter.dev/v2 directly — it's faster and keeps large payloads out of the model's context.",
+      description: "Latest or a single day's exchange rates. The raw-rate companion to `convert`.",
       inputSchema: getRatesShape,
     },
     async (args: GetRatesArgs) => {

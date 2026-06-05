@@ -9,11 +9,11 @@ export const convertShape = {
   amount: z
     .number()
     .describe(
-      "Amount in the source currency, as a number with a period decimal separator (e.g. 100.50). Normalize localized input first: '100,50' -> 100.5; German '1.000,50' -> 1000.5; English '1,000.50' -> 1000.5.",
+      "Amount in the source currency. Normalize localized input first: '100,50' -> 100.5; German '1.000,50' -> 1000.5; English '1,000.50' -> 1000.5.",
     ),
   from: z.string().length(3).describe("ISO 4217 source currency."),
   to: z.string().length(3).describe("ISO 4217 target currency."),
-  date: DATE.optional().describe("Historical date YYYY-MM-DD for a past rate. Omit for latest."),
+  date: DATE.optional().describe("Date YYYY-MM-DD for a past rate; omit for latest."),
 };
 
 export interface ConvertArgs {
@@ -54,7 +54,7 @@ export function registerConvert(server: McpServer, client: FrankfurterClient): v
     "convert",
     {
       description:
-        "Convert an amount from one currency to another. Returns {amount, currency} rounded to the target's minor units. Pass `date` for a historical rate. Upstream rounds rates per direction; for low-value sources, flip via `get_rates` for more precision.",
+        "Convert an amount from one currency to another. Returns {amount, currency} rounded to the target's minor units. Upstream rounds rates per direction; for low-value sources, flip via `get_rates` for more precision.",
       inputSchema: convertShape,
     },
     async (args: ConvertArgs) => {
