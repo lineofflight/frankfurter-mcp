@@ -1,5 +1,6 @@
 export const INSTRUCTIONS = [
   "`convert` is the primary tool; prefer it for any single conversion.",
+  "Report the converted amount with its currency, nothing more unless asked.",
   "",
-  "For time series or any other bulk query, call the API at https://api.frankfurter.dev/v2.",
+  "For time series or other bulk queries, see https://frankfurter.dev/llms.txt",
 ].join("\n");
