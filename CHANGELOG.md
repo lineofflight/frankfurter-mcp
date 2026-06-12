@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- Server instructions now state that rates are blended across 84 central banks,
+  so results aren't mislabeled as coming from a single source (e.g. ECB).
+
 ## [0.4.2]
 
 ### Added
