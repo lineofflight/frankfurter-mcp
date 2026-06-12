@@ -53,8 +53,10 @@ export function registerConvert(server: McpServer, client: FrankfurterClient): v
   server.registerTool(
     "convert",
     {
+      title: "Convert currency",
       description:
         "Convert an amount from one currency to another. Returns {amount, currency} rounded to the target's minor units. Upstream rounds rates per direction; for low-value sources, flip via `get_rates` for more precision.",
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: convertShape,
     },
     async (args: ConvertArgs) => {

@@ -23,7 +23,9 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
   server.registerTool(
     "get_rates",
     {
+      title: "Get exchange rates",
       description: "Latest or a single day's exchange rates. The raw-rate companion to `convert`.",
+      annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: getRatesShape,
     },
     async (args: GetRatesArgs) => {
