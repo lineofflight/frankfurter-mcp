@@ -9,3 +9,7 @@ test("instructions center on convert and nudge bulk queries to the docs", () => 
 test("instructions no longer reference the removed list_providers tool", () => {
   expect(INSTRUCTIONS).not.toMatch(/list_providers/);
 });
+
+test("instructions state the blended-provider provenance, not a single source", () => {
+  expect(INSTRUCTIONS).toMatch(/blended across 84 central banks/);
+});
