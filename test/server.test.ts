@@ -16,7 +16,7 @@ test("server exposes all tools", async () => {
 
   const tools = await client.listTools();
   const names = tools.tools.map((t) => t.name).sort();
-  expect(names).toEqual(["convert", "get_rates", "list_currencies"]);
+  expect(names).toEqual(["convert", "get_rates", "list_currencies", "list_providers"]);
 
   const caps = client.getServerVersion();
   expect(caps?.name).toBe("frankfurter");

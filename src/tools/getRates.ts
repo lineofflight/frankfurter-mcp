@@ -11,12 +11,21 @@ export const getRatesShape = {
     .array(z.string().length(3))
     .optional()
     .describe("ISO 4217 quote codes to return; omit for all."),
+  provider: z
+    .string()
+    .min(2)
+    .max(8)
+    .optional()
+    .describe(
+      "Provider key, e.g. UST for U.S. Treasury reporting rates. Serves that institution's published rates instead of the blend; a date inside a monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
+    ),
 };
 
 export interface GetRatesArgs {
   base?: string;
   date?: string;
   quotes?: string[];
+  provider?: string;
 }
 
 export function registerGetRates(server: McpServer, client: FrankfurterClient): void {
@@ -24,7 +33,8 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
     "get_rates",
     {
       title: "Get exchange rates",
-      description: "Latest or a single day's exchange rates. The raw-rate companion to `convert`.",
+      description:
+        "Latest or a single day's exchange rates. The raw-rate companion to `convert`. With `provider`, one institution's published rates: on its own base the digits are as published, with the date they took effect.",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: getRatesShape,
     },
@@ -34,6 +44,7 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
           base: args.base,
           date: args.date,
           quotes: args.quotes,
+          provider: args.provider,
         });
         return { content: [{ type: "text" as const, text: JSON.stringify(records, null, 2) }] };
       } catch (e) {

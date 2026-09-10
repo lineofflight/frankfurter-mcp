@@ -27,6 +27,7 @@ src/
     convert.ts      # convert: schema + arithmetic + handler (primary tool)
     getRates.ts     # get_rates: schema + handler (latest / single-date snapshot)
     listCurrencies.ts # list_currencies: lists supported currency codes/names
+    listProviders.ts  # list_providers: trimmed provider summaries
   instructions.ts   # server-level MCP instructions string
   rounding.ts       # money rounding: ISO minor units / 8 sig-figs for metals
   types.ts          # shared types
@@ -40,15 +41,22 @@ server.json         # MCP registry manifest (remote server, root URL)
 
 - `convert` — the primary tool. Convert an amount between two currencies.
   Returns a money object `{ amount, currency }` and nothing else; pass `date`
-  for a historical rate. Rounded to the target's ISO minor units, or 8
-  significant figures for metals/unknown-precision codes.
+  for a historical rate, `provider` for one institution's published rate.
+  Rounded to the target's ISO minor units, or 8 significant figures for
+  metals/unknown-precision codes.
 - `get_rates` — blended reference rates for the latest day or a single `date`.
-  Optional `base` and `quotes`. The raw-rate companion behind a conversion.
+  Optional `base`, `quotes` and `provider`. The raw-rate companion behind a
+  conversion. `provider` routes to `/v2/providers/{key}/rates`: one
+  institution's rates as published, never blended, with carry-forward across a
+  monthly or quarterly provider's period.
 - `list_currencies` — supported ISO 4217 currency codes and names as
   `{ code: name }`.
+- `list_providers` — the institutions relayed, trimmed to key, name, country,
+  rate type, pivot, frequency, coverage dates and a currency count. The
+  per-provider currency list is left out of the payload.
 
-For time series, historical ranges, provider-specific rates, or bulk queries,
-use the REST API at `https://api.frankfurter.dev/v2` directly.
+For time series, historical ranges, or bulk queries, use the REST API at
+`https://api.frankfurter.dev/v2` directly.
 
 ## Commands
 

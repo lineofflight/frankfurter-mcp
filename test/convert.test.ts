@@ -35,3 +35,19 @@ test("metal target: 8 significant figures, no float noise", async () => {
   // 100 * 0.00022 = 0.022000000000000002 (IEEE-754); clamped to 0.022.
   expect(out).toEqual({ amount: 0.022, currency: "XAU" });
 });
+
+test("provider is passed through and named in the not-found error", async () => {
+  const client = clientReturning(0.877, "EUR", "2026-06-30");
+  await runConvert(
+    { amount: 100, from: "USD", to: "EUR", date: "2026-07-15", provider: "UST" },
+    client,
+  );
+  expect(client.getRates).toHaveBeenCalledWith(
+    expect.objectContaining({ base: "USD", quotes: ["EUR"], date: "2026-07-15", provider: "UST" }),
+  );
+
+  const empty = { getRates: vi.fn(async () => []) } as unknown as FrankfurterClient;
+  await expect(
+    runConvert({ amount: 1, from: "USD", to: "XXX", provider: "ust" }, empty),
+  ).rejects.toThrow(/USD->XXX from UST/);
+});
