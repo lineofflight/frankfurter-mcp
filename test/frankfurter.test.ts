@@ -9,6 +9,10 @@ const BASE = "https://api.test";
 let lastUrl = "";
 
 const server = setupServer(
+  http.get(`${BASE}/v2/providers/:key/rates`, ({ request }) => {
+    lastUrl = request.url;
+    return HttpResponse.json(dated);
+  }),
   http.get(`${BASE}/v2/rates`, ({ request }) => {
     lastUrl = request.url;
     const u = new URL(request.url);
@@ -40,4 +44,20 @@ test("throws with status and body on non-2xx", async () => {
   server.use(http.get(`${BASE}/v2/rates`, () => HttpResponse.text("not found", { status: 404 })));
   const c = new FrankfurterClient(BASE);
   await expect(c.getRates({})).rejects.toThrow(/404/);
+});
+
+test("routes a provider to its own rates path, key lowercased, other params intact", async () => {
+  const c = new FrankfurterClient(BASE);
+  const out = await c.getRates({
+    provider: "UST",
+    base: "USD",
+    date: "2026-07-15",
+    quotes: ["EUR"],
+  });
+  const u = new URL(lastUrl);
+  expect(u.pathname).toBe("/v2/providers/ust/rates");
+  expect(u.searchParams.get("base")).toBe("USD");
+  expect(u.searchParams.get("date")).toBe("2026-07-15");
+  expect(u.searchParams.get("quotes")).toBe("EUR");
+  expect(out).toEqual(dated);
 });

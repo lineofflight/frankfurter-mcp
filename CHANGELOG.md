@@ -4,6 +4,22 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [0.5.0]
+
+### Added
+
+- `provider` on `convert` and `get_rates`: one institution's published rates
+  instead of the blend, for tax and customs filings. `UST` gives the U.S.
+  Treasury's quarterly reporting rate, and a date inside the quarter returns
+  the rate in force.
+- `list_providers`: the institutions relayed, with key, rate type, frequency
+  and coverage dates, to pick a `provider`.
+
+### Changed
+
+- Server instructions say rates are blended across 96 central banks and
+  official sources and explain when to pass `provider`.
+
 ## [0.4.3]
 
 ### Changed

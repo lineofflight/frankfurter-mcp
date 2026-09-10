@@ -14,6 +14,14 @@ export const convertShape = {
   from: z.string().length(3).describe("ISO 4217 source currency."),
   to: z.string().length(3).describe("ISO 4217 target currency."),
   date: DATE.optional().describe("Date YYYY-MM-DD for a past rate; omit for latest."),
+  provider: z
+    .string()
+    .min(2)
+    .max(8)
+    .optional()
+    .describe(
+      "Provider key, e.g. UST for U.S. Treasury reporting rates. Serves that institution's published rates instead of the blend; a date inside a monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
+    ),
 };
 
 export interface ConvertArgs {
@@ -21,6 +29,7 @@ export interface ConvertArgs {
   from: string;
   to: string;
   date?: string;
+  provider?: string;
 }
 
 // A money object: the converted value and its currency. Nothing else — for the
@@ -41,10 +50,18 @@ export async function runConvert(
     return { amount: roundMoney(args.amount, to), currency: to };
   }
 
-  const records = await client.getRates({ base: from, quotes: [to], date: args.date });
+  const records = await client.getRates({
+    base: from,
+    quotes: [to],
+    date: args.date,
+    provider: args.provider,
+  });
   const record = records.find((r) => r.quote.toUpperCase() === to);
   if (!record) {
-    throw new Error(`No rate available for ${from}->${to}${args.date ? ` on ${args.date}` : ""}.`);
+    const where = args.provider ? ` from ${args.provider.toUpperCase()}` : "";
+    throw new Error(
+      `No rate available for ${from}->${to}${where}${args.date ? ` on ${args.date}` : ""}.`,
+    );
   }
   return { amount: roundMoney(args.amount * record.rate, to), currency: to };
 }
@@ -55,7 +72,7 @@ export function registerConvert(server: McpServer, client: FrankfurterClient): v
     {
       title: "Convert currency",
       description:
-        "Convert an amount from one currency to another. Returns {amount, currency} rounded to the target's minor units. Upstream rounds rates per direction; for low-value sources, flip via `get_rates` for more precision.",
+        "Convert an amount from one currency to another. Returns {amount, currency} rounded to the target's minor units. Upstream rounds rates per direction; for low-value sources, flip via `get_rates` for more precision. Pass `provider` to use one institution's published rate, e.g. UST for a U.S. Treasury reporting rate.",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: convertShape,
     },

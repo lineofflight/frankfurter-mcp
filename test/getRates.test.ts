@@ -12,7 +12,7 @@ async function connect(fc: FrankfurterClient): Promise<Client> {
   return client;
 }
 
-test("get_rates input accepts only base, date, quotes", async () => {
+test("get_rates input accepts base, date, quotes and provider", async () => {
   const fc = new FrankfurterClient("https://api.test");
   vi.spyOn(fc, "getRates").mockResolvedValue([]);
   const client = await connect(fc);
@@ -20,7 +20,7 @@ test("get_rates input accepts only base, date, quotes", async () => {
   const { tools } = await client.listTools();
   const getRates = tools.find((t) => t.name === "get_rates");
   const props = Object.keys(getRates?.inputSchema.properties ?? {}).sort();
-  expect(props).toEqual(["base", "date", "quotes"]);
+  expect(props).toEqual(["base", "date", "provider", "quotes"]);
 });
 
 test("get_rates relays the records for a single date", async () => {
@@ -33,5 +33,21 @@ test("get_rates relays the records for a single date", async () => {
   const res = await client.callTool({ name: "get_rates", arguments: { date: "2024-03-15" } });
   const text = (res.content as Array<{ type: string; text: string }>)[0].text;
   expect(JSON.parse(text)).toEqual([{ date: "2024-03-15", base: "EUR", quote: "USD", rate: 1.08 }]);
-  expect(spy).toHaveBeenCalledWith({ base: undefined, date: "2024-03-15", quotes: undefined });
+  expect(spy).toHaveBeenCalledWith({
+    base: undefined,
+    date: "2024-03-15",
+    quotes: undefined,
+    provider: undefined,
+  });
+});
+
+test("get_rates passes provider through to the client", async () => {
+  const fc = new FrankfurterClient("https://api.test");
+  const spy = vi
+    .spyOn(fc, "getRates")
+    .mockResolvedValue([{ date: "2026-06-30", base: "USD", quote: "EUR", rate: 0.877 }]);
+  const client = await connect(fc);
+
+  await client.callTool({ name: "get_rates", arguments: { provider: "UST", base: "USD" } });
+  expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "UST", base: "USD" }));
 });
