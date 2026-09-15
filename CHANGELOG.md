@@ -4,6 +4,13 @@ All notable changes to this project are documented here. The format follows
 [Keep a Changelog](https://keepachangelog.com/), and this project adheres to
 [Semantic Versioning](https://semver.org/).
 
+## [Unreleased]
+
+### Changed
+
+- `get_rates` accepts a single `quotes` code as a bare string, e.g. `"USD"`,
+  since models often send one code without wrapping it in a list.
+
 ## [0.5.0]
 
 ### Added
