@@ -7,8 +7,9 @@ const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "expected YYYY-MM-DD");
 export const getRatesShape = {
   base: z.string().length(3).optional().describe("ISO 4217 base currency. Default EUR."),
   date: DATE.optional().describe("Single day YYYY-MM-DD. Omit for the latest rates."),
+  // Models often send a lone code as a bare string; wrap it rather than reject.
   quotes: z
-    .array(z.string().length(3))
+    .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(z.string().length(3)))
     .optional()
     .describe("ISO 4217 quote codes to return; omit for all."),
   provider: z
