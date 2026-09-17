@@ -6,6 +6,12 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.1]
+
+### Added
+
+- Light and dark theme PNG icons in `server.json` for MCP clients and registries.
+
 ### Changed
 
 - `get_rates` accepts a single `quotes` code as a bare string, e.g. `"USD"`,
