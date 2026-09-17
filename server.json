@@ -9,6 +9,20 @@
   },
   "version": "0.5.0",
   "websiteUrl": "https://frankfurter.dev",
+  "icons": [
+    {
+      "src": "https://frankfurter.dev/images/logo.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"],
+      "theme": "light"
+    },
+    {
+      "src": "https://frankfurter.dev/images/logo-dark.png",
+      "mimeType": "image/png",
+      "sizes": ["512x512"],
+      "theme": "dark"
+    }
+  ],
   "remotes": [
     {
       "type": "streamable-http",
