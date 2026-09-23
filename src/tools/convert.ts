@@ -20,7 +20,7 @@ export const convertShape = {
     .max(8)
     .optional()
     .describe(
-      "Provider key, e.g. UST for U.S. Treasury reporting rates. Serves that institution's published rates instead of the blend; a date inside a monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
+      "Provider key, e.g. ECB for European Central Bank or UST for U.S. Treasury reporting rates. Serves that institution's published rates instead of the blend; a date inside a monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
     ),
 };
 

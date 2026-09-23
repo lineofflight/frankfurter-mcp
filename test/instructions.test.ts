@@ -14,8 +14,10 @@ test("instructions state the blended-provider provenance, not a single source", 
   expect(INSTRUCTIONS).toMatch(/blended across central banks and official sources/);
 });
 
-test("instructions explain provider for published figures and name UST", () => {
+test("instructions explain provider for published figures and name ECB and UST", () => {
   expect(INSTRUCTIONS).toMatch(/Pass `provider`/);
+  expect(INSTRUCTIONS).toContain("ECB");
   expect(INSTRUCTIONS).toContain("UST");
   expect(INSTRUCTIONS).toContain("`list_providers`");
+  expect(INSTRUCTIONS).toContain("`get_rates` accepts multiple providers");
 });
