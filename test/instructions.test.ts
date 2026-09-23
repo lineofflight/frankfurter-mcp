@@ -11,7 +11,7 @@ test("instructions point provider discovery at list_providers", () => {
 });
 
 test("instructions state the blended-provider provenance, not a single source", () => {
-  expect(INSTRUCTIONS).toMatch(/blended across 96 central banks and official sources/);
+  expect(INSTRUCTIONS).toMatch(/blended across central banks and official sources/);
 });
 
 test("instructions explain provider for published figures and name UST", () => {
