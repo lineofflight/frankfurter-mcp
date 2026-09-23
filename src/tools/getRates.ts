@@ -13,20 +13,23 @@ export const getRatesShape = {
     .optional()
     .describe("ISO 4217 quote codes to return; omit for all."),
   provider: z
-    .string()
-    .min(2)
-    .max(8)
+    .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(z.string().min(2).max(8)))
     .optional()
     .describe(
-      "Provider key, e.g. UST for U.S. Treasury reporting rates. Serves that institution's published rates instead of the blend; a date inside a monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
+      "Provider key or keys, e.g. ECB or ['ECB', 'HMRC']. Serves published rates instead of the blend; a date inside a monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
     ),
+  providers: z
+    .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(z.string().min(2).max(8)))
+    .optional()
+    .describe("Alias for `provider` accepting multiple provider keys."),
 };
 
 export interface GetRatesArgs {
   base?: string;
   date?: string;
   quotes?: string[];
-  provider?: string;
+  provider?: string[];
+  providers?: string[];
 }
 
 export function registerGetRates(server: McpServer, client: FrankfurterClient): void {
@@ -35,19 +38,37 @@ export function registerGetRates(server: McpServer, client: FrankfurterClient): 
     {
       title: "Get exchange rates",
       description:
-        "Latest or a single day's exchange rates. The raw-rate companion to `convert`. With `provider`, one institution's published rates: on its own base the digits are as published, with the date they took effect.",
+        "Latest or a single day's exchange rates. The raw-rate companion to `convert`. With `provider`, published rates from one or more institutions: on its own base the digits are as published, with the date they took effect.",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: getRatesShape,
     },
     async (args: GetRatesArgs) => {
       try {
-        const records = await client.getRates({
-          base: args.base,
-          date: args.date,
-          quotes: args.quotes,
-          provider: args.provider,
-        });
-        return { content: [{ type: "text" as const, text: JSON.stringify(records, null, 2) }] };
+        const rawProviders = args.providers ?? args.provider;
+        if (!rawProviders || rawProviders.length === 0) {
+          const records = await client.getRates({
+            base: args.base,
+            date: args.date,
+            quotes: args.quotes,
+            provider: undefined,
+          });
+          return { content: [{ type: "text" as const, text: JSON.stringify(records, null, 2) }] };
+        }
+
+        const allRecords = await Promise.all(
+          rawProviders.map(async (p) => {
+            const records = await client.getRates({
+              base: args.base,
+              date: args.date,
+              quotes: args.quotes,
+              provider: p,
+            });
+            return records.map((r) => ({ ...r, provider: p.toUpperCase() }));
+          }),
+        );
+        return {
+          content: [{ type: "text" as const, text: JSON.stringify(allRecords.flat(), null, 2) }],
+        };
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         return { content: [{ type: "text" as const, text: `Error: ${msg}` }], isError: true };

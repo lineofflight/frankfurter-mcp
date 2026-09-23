@@ -3,6 +3,7 @@ export interface RateRecord {
   base: string;
   quote: string;
   rate: number;
+  provider?: string;
 }
 
 export interface Currency {

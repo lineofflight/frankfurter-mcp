@@ -12,7 +12,7 @@ async function connect(fc: FrankfurterClient): Promise<Client> {
   return client;
 }
 
-test("get_rates input accepts base, date, quotes and provider", async () => {
+test("get_rates input accepts base, date, quotes, provider, and providers", async () => {
   const fc = new FrankfurterClient("https://api.test");
   vi.spyOn(fc, "getRates").mockResolvedValue([]);
   const client = await connect(fc);
@@ -20,7 +20,7 @@ test("get_rates input accepts base, date, quotes and provider", async () => {
   const { tools } = await client.listTools();
   const getRates = tools.find((t) => t.name === "get_rates");
   const props = Object.keys(getRates?.inputSchema.properties ?? {}).sort();
-  expect(props).toEqual(["base", "date", "provider", "quotes"]);
+  expect(props).toEqual(["base", "date", "provider", "providers", "quotes"]);
 });
 
 test("get_rates relays the records for a single date", async () => {
@@ -51,13 +51,57 @@ test("get_rates accepts a single quote code as a string", async () => {
   expect(spy).toHaveBeenCalledWith(expect.objectContaining({ quotes: ["USD"] }));
 });
 
-test("get_rates passes provider through to the client", async () => {
+test("get_rates passes provider through to the client and tags the record", async () => {
   const fc = new FrankfurterClient("https://api.test");
   const spy = vi
     .spyOn(fc, "getRates")
     .mockResolvedValue([{ date: "2026-06-30", base: "USD", quote: "EUR", rate: 0.877 }]);
   const client = await connect(fc);
 
-  await client.callTool({ name: "get_rates", arguments: { provider: "UST", base: "USD" } });
+  const res = await client.callTool({
+    name: "get_rates",
+    arguments: { provider: "UST", base: "USD" },
+  });
   expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "UST", base: "USD" }));
+  const text = (res.content as Array<{ type: string; text: string }>)[0].text;
+  expect(JSON.parse(text)).toEqual([
+    { date: "2026-06-30", base: "USD", quote: "EUR", rate: 0.877, provider: "UST" },
+  ]);
+});
+
+test("get_rates queries multiple providers and tags each record", async () => {
+  const fc = new FrankfurterClient("https://api.test");
+  vi.spyOn(fc, "getRates").mockImplementation(async ({ provider }) => {
+    if (provider === "ECB") {
+      return [{ date: "2026-09-22", base: "EUR", quote: "USD", rate: 1.1463 }];
+    }
+    if (provider === "HMRC") {
+      return [{ date: "2026-09-01", base: "EUR", quote: "USD", rate: 1.1603 }];
+    }
+    return [];
+  });
+  const client = await connect(fc);
+
+  const res = await client.callTool({
+    name: "get_rates",
+    arguments: { providers: ["ECB", "HMRC"], quotes: ["USD"] },
+  });
+  const text = (res.content as Array<{ type: string; text: string }>)[0].text;
+  expect(JSON.parse(text)).toEqual([
+    { date: "2026-09-22", base: "EUR", quote: "USD", rate: 1.1463, provider: "ECB" },
+    { date: "2026-09-01", base: "EUR", quote: "USD", rate: 1.1603, provider: "HMRC" },
+  ]);
+});
+
+test("get_rates accepts an array under provider as well", async () => {
+  const fc = new FrankfurterClient("https://api.test");
+  const spy = vi.spyOn(fc, "getRates").mockResolvedValue([]);
+  const client = await connect(fc);
+
+  await client.callTool({
+    name: "get_rates",
+    arguments: { provider: ["ECB", "HMRC"] },
+  });
+  expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "ECB" }));
+  expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "HMRC" }));
 });
