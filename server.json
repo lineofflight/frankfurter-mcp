@@ -7,19 +7,23 @@
     "url": "https://github.com/lineofflight/frankfurter-mcp",
     "source": "github"
   },
-  "version": "0.5.1",
+  "version": "0.5.2",
   "websiteUrl": "https://frankfurter.dev",
   "icons": [
     {
       "src": "https://frankfurter.dev/images/logo.png",
       "mimeType": "image/png",
-      "sizes": ["512x512"],
+      "sizes": [
+        "512x512"
+      ],
       "theme": "light"
     },
     {
       "src": "https://frankfurter.dev/images/logo-dark.png",
       "mimeType": "image/png",
-      "sizes": ["512x512"],
+      "sizes": [
+        "512x512"
+      ],
       "theme": "dark"
     }
   ],
