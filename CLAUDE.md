@@ -45,10 +45,10 @@ server.json         # MCP registry manifest (remote server, root URL)
   Rounded to the target's ISO minor units, or 8 significant figures for
   metals/unknown-precision codes.
 - `get_rates` — blended reference rates for the latest day or a single `date`.
-  Optional `base`, `quotes` and `provider`. The raw-rate companion behind a
-  conversion. `provider` routes to `/v2/providers/{key}/rates`: one
-  institution's rates as published, never blended, with carry-forward across a
-  monthly or quarterly provider's period.
+  Optional `base`, `quotes` and `provider` / `providers`. The raw-rate companion
+  behind a conversion. `provider` routes to `/v2/providers/{key}/rates`: one or
+  more institutions' rates as published, never blended, with carry-forward
+  across a weekly, monthly or quarterly provider's period.
 - `list_currencies` — supported ISO 4217 currency codes and names as
   `{ code: name }`.
 - `list_providers` — the institutions relayed, trimmed to key, name, country,

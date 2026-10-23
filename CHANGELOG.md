@@ -6,6 +6,22 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.2]
+
+### Added
+
+- `get_rates` accepts multiple provider keys via `providers` (or an array under
+  `provider`) and tags each returned record with `provider`.
+
+### Changed
+
+- `list_currencies` requests `scope=all` so historical currencies remain
+  discoverable alongside active ones.
+- Provider frequency types and descriptions include `weekly` alongside `daily`,
+  `monthly` and `quarterly`.
+- Server instructions drop the hardcoded provider count and document
+  multi-provider lookups.
+
 ## [0.5.1]
 
 ### Added

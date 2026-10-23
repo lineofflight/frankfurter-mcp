@@ -19,6 +19,10 @@ const server = setupServer(
     if (u.searchParams.get("date") === "2024-03-15") return HttpResponse.json(dated);
     return HttpResponse.json(latest);
   }),
+  http.get(`${BASE}/v2/currencies`, ({ request }) => {
+    lastUrl = request.url;
+    return HttpResponse.json([{ iso_code: "USD", name: "United States Dollar" }]);
+  }),
 );
 
 beforeAll(() => server.listen({ onUnhandledRequest: "error" }));
@@ -60,4 +64,13 @@ test("routes a provider to its own rates path, key lowercased, other params inta
   expect(u.searchParams.get("date")).toBe("2026-07-15");
   expect(u.searchParams.get("quotes")).toBe("EUR");
   expect(out).toEqual(dated);
+});
+
+test("fetches all currencies including archived ones via scope=all", async () => {
+  const c = new FrankfurterClient(BASE);
+  const out = await c.getCurrencies();
+  const u = new URL(lastUrl);
+  expect(u.pathname).toBe("/v2/currencies");
+  expect(u.searchParams.get("scope")).toBe("all");
+  expect(out).toEqual([{ iso_code: "USD", name: "United States Dollar" }]);
 });

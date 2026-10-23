@@ -11,9 +11,10 @@ over Frankfurter's v2 blended multi-source reference rates.
   units. Pass `date` for a historical rate, `provider` for one institution's
   published rate (e.g. `UST`, the U.S. Treasury's quarterly reporting rate).
 - **`get_rates`** — blended reference rates for the latest day or a single
-  `date`. Optional `base`, `quotes` and `provider`. The raw-rate companion to
-  `convert`; with `provider` and the provider's own base, the digits are as
-  published, with the date they took effect.
+  `date`. Optional `base`, `quotes` and `provider` (or `providers` to compare
+  multiple institutions). The raw-rate companion to `convert`; with `provider`
+  and the provider's own base, the digits are as published, with the date they
+  took effect.
 - **`list_currencies`** — supported ISO 4217 codes and names as `{ code: name }`.
 - **`list_providers`** — the institutions relayed, with key, rate type,
   frequency and coverage dates, to pick a `provider`.

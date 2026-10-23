@@ -38,7 +38,7 @@ export class FrankfurterClient {
   }
 
   async getCurrencies(): Promise<Currency[]> {
-    const url = new URL("/v2/currencies", this.baseUrl);
+    const url = new URL("/v2/currencies?scope=all", this.baseUrl);
     const res = await fetch(url, { headers: { accept: "application/json" } });
     if (!res.ok) {
       const body = await res.text();

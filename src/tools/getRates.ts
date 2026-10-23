@@ -16,7 +16,7 @@ export const getRatesShape = {
     .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(z.string().min(2).max(8)))
     .optional()
     .describe(
-      "Provider key or keys, e.g. ECB or ['ECB', 'HMRC']. Serves published rates instead of the blend; a date inside a monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
+      "Provider key or keys, e.g. ECB or ['ECB', 'HMRC']. Serves published rates instead of the blend; a date inside a weekly, monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
     ),
   providers: z
     .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(z.string().min(2).max(8)))

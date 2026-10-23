@@ -37,7 +37,7 @@ export function registerListProviders(server: McpServer, client: FrankfurterClie
     {
       title: "List providers",
       description:
-        "List the institutions whose rates Frankfurter relays, with key, rate type, frequency (daily, monthly or quarterly) and coverage dates. Use a key as `provider` in `convert` or `get_rates` for that institution's published rates instead of the blend.",
+        "List the institutions whose rates Frankfurter relays, with key, rate type, frequency (daily, weekly, monthly or quarterly) and coverage dates. Use a key as `provider` in `convert` or `get_rates` for that institution's published rates instead of the blend.",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {},
     },

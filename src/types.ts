@@ -33,7 +33,7 @@ export interface Provider {
   start_date?: string | null;
   end_date?: string | null;
   publish_cadence?: string | null;
-  frequency?: "daily" | "monthly" | "quarterly";
+  frequency?: "daily" | "weekly" | "monthly" | "quarterly";
   publishes_missed?: number | null;
   currencies: string[];
 }
