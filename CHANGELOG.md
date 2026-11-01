@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.3]
+
+First deployed release carrying the 0.5.2 changes. 0.5.2 failed lint in CI, so
+its image was never published.
+
+### Fixed
+
+- `npm version` now formats `server.json` after syncing it, so a version bump
+  no longer fails `biome check`.
+
 ## [0.5.2]
 
 ### Added
