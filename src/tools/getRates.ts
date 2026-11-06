@@ -3,15 +3,17 @@ import { z } from "zod";
 import type { FrankfurterClient } from "../frankfurter.js";
 
 const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "expected YYYY-MM-DD");
+// ISO 4217 codes are three letters; crypto asset codes run longer (USDT, AVAX).
+const CODE = z.string().regex(/^[A-Za-z0-9]{3,5}$/, "expected a 3 to 5 character code");
 
 export const getRatesShape = {
-  base: z.string().length(3).optional().describe("ISO 4217 base currency. Default EUR."),
+  base: CODE.optional().describe("Base currency or asset code. Default EUR."),
   date: DATE.optional().describe("Single day YYYY-MM-DD. Omit for the latest rates."),
   // Models often send a lone code as a bare string; wrap it rather than reject.
   quotes: z
-    .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(z.string().length(3)))
+    .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(CODE))
     .optional()
-    .describe("ISO 4217 quote codes to return; omit for all."),
+    .describe("Currency or asset codes to return; omit for all."),
   provider: z
     .preprocess((v) => (typeof v === "string" ? [v] : v), z.array(z.string().min(2).max(8)))
     .optional()

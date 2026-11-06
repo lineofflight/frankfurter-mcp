@@ -43,14 +43,15 @@ server.json         # MCP registry manifest (remote server, root URL)
   Returns a money object `{ amount, currency }` and nothing else; pass `date`
   for a historical rate, `provider` for one institution's published rate.
   Rounded to the target's ISO minor units, or 8 significant figures for
-  metals/unknown-precision codes.
+  metals, crypto and other unknown-precision codes. Codes run three to five
+  letters or digits, so crypto assets like `USDT` fit.
 - `get_rates` — blended reference rates for the latest day or a single `date`.
   Optional `base`, `quotes` and `provider` / `providers`. The raw-rate companion
   behind a conversion. `provider` routes to `/v2/providers/{key}/rates`: one or
   more institutions' rates as published, never blended, with carry-forward
   across a weekly, monthly or quarterly provider's period.
-- `list_currencies` — supported ISO 4217 currency codes and names as
-  `{ code: name }`.
+- `list_currencies` — supported currency, precious metal and crypto asset
+  codes and names as `{ code: name }`.
 - `list_providers` — the institutions relayed, trimmed to key, name, country,
   rate type, pivot, frequency, coverage dates and a currency count. The
   per-provider currency list is left out of the payload.

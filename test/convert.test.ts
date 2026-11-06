@@ -1,6 +1,7 @@
 import { expect, test, vi } from "vitest";
+import { z } from "zod";
 import type { FrankfurterClient } from "../src/frankfurter.js";
-import { runConvert } from "../src/tools/convert.js";
+import { convertShape, runConvert } from "../src/tools/convert.js";
 
 function clientReturning(rate: number, quote = "EUR", date = "2024-01-15") {
   return {
@@ -50,4 +51,19 @@ test("provider is passed through and named in the not-found error", async () => 
   await expect(
     runConvert({ amount: 1, from: "USD", to: "XXX", provider: "ust" }, empty),
   ).rejects.toThrow(/USD->XXX from UST/);
+});
+
+test("codes run from three to five letters or digits, so crypto assets fit", () => {
+  const schema = z.object(convertShape);
+  expect(schema.safeParse({ amount: 1, from: "USDT", to: "eur" }).success).toBe(true);
+  expect(schema.safeParse({ amount: 1, from: "AVAX", to: "BTC" }).success).toBe(true);
+  expect(schema.safeParse({ amount: 1, from: "US", to: "EUR" }).success).toBe(false);
+  expect(schema.safeParse({ amount: 1, from: "USD", to: "EURUSD" }).success).toBe(false);
+  expect(schema.safeParse({ amount: 1, from: "US$", to: "EUR" }).success).toBe(false);
+});
+
+test("crypto target: 8 significant figures", async () => {
+  const client = clientReturning(0.99987654321, "USDT");
+  const out = await runConvert({ amount: 100, from: "USD", to: "USDT" }, client);
+  expect(out).toEqual({ amount: 99.987654, currency: "USDT" });
 });
