@@ -15,7 +15,8 @@ over Frankfurter's v2 blended multi-source reference rates.
   multiple institutions). The raw-rate companion to `convert`; with `provider`
   and the provider's own base, the digits are as published, with the date they
   took effect.
-- **`list_currencies`** — supported ISO 4217 codes and names as `{ code: name }`.
+- **`list_currencies`** — supported currency, precious metal and crypto asset
+  codes and names as `{ code: name }`.
 - **`list_providers`** — the institutions relayed, with key, rate type,
   frequency and coverage dates, to pick a `provider`.
 

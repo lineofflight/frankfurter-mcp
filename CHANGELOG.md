@@ -6,6 +6,16 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.4]
+
+### Changed
+
+- `convert` and `get_rates` accept codes of three to five letters or digits,
+  so crypto assets such as `USDT` and `AVAX` pass validation. Their
+  descriptions say currency or asset code rather than ISO 4217.
+- `list_currencies` describes its codes as currencies, precious metals and
+  crypto assets.
+
 ## [0.5.3]
 
 First deployed release carrying the 0.5.2 changes. 0.5.2 failed lint in CI, so

@@ -4,6 +4,8 @@ import type { FrankfurterClient } from "../frankfurter.js";
 import { roundMoney } from "../rounding.js";
 
 const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "expected YYYY-MM-DD");
+// ISO 4217 codes are three letters; crypto asset codes run longer (USDT, AVAX).
+const CODE = z.string().regex(/^[A-Za-z0-9]{3,5}$/, "expected a 3 to 5 character code");
 
 export const convertShape = {
   amount: z
@@ -11,8 +13,8 @@ export const convertShape = {
     .describe(
       "Amount in the source currency. Normalize localized input first: '100,50' -> 100.5; German '1.000,50' -> 1000.5; English '1,000.50' -> 1000.5.",
     ),
-  from: z.string().length(3).describe("ISO 4217 source currency."),
-  to: z.string().length(3).describe("ISO 4217 target currency."),
+  from: CODE.describe("Source currency or asset code, e.g. USD, XAU or BTC."),
+  to: CODE.describe("Target currency or asset code."),
   date: DATE.optional().describe("Date YYYY-MM-DD for a past rate; omit for latest."),
   provider: z
     .string()

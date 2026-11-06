@@ -51,6 +51,21 @@ test("get_rates accepts a single quote code as a string", async () => {
   expect(spy).toHaveBeenCalledWith(expect.objectContaining({ quotes: ["USD"] }));
 });
 
+test("get_rates accepts crypto asset codes longer than three letters", async () => {
+  const fc = new FrankfurterClient("https://api.test");
+  const spy = vi.spyOn(fc, "getRates").mockResolvedValue([]);
+  const client = await connect(fc);
+
+  const res = await client.callTool({
+    name: "get_rates",
+    arguments: { base: "USDT", quotes: ["AVAX", "BTC"] },
+  });
+  expect(res.isError).toBeFalsy();
+  expect(spy).toHaveBeenCalledWith(
+    expect.objectContaining({ base: "USDT", quotes: ["AVAX", "BTC"] }),
+  );
+});
+
 test("get_rates passes provider through to the client and tags the record", async () => {
   const fc = new FrankfurterClient("https://api.test");
   const spy = vi

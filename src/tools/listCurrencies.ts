@@ -7,7 +7,7 @@ export function registerListCurrencies(server: McpServer, client: FrankfurterCli
     {
       title: "List currencies",
       description:
-        "List all supported ISO 4217 currency codes and their full names (e.g. { 'USD': 'United States Dollar' }).",
+        "List all supported currency, precious metal and crypto asset codes and their full names (e.g. { 'USD': 'United States Dollar' }).",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {},
     },
