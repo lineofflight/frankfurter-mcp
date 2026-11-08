@@ -10,15 +10,30 @@ over Frankfurter's v2 blended multi-source reference rates.
   returns a money object `{ amount, currency }` rounded to the target's minor
   units. Pass `date` for a historical rate, `provider` for one institution's
   published rate (e.g. `UST`, the U.S. Treasury's quarterly reporting rate).
+  Set `details: true` to include the rate, effective date, and selected provider
+  in the same call. Same-currency conversions return rate 1 and date null.
+  Conversion uses the direct API rate, including its precision for tiny rates.
 - **`get_rates`** — blended reference rates for the latest day or a single
-  `date`. Optional `base`, `quotes` and `provider` (or `providers` to compare
-  multiple institutions). The raw-rate companion to `convert`; with `provider`
+  `date`. Optional `base`, `quotes` and `provider` (one key or an array to compare
+  institutions). Supply `quotes` whenever the requested currencies are known. The raw-rate companion to `convert`; with `provider`
   and the provider's own base, the digits are as published, with the date they
-  took effect.
+  took effect. Successful calls return an array; if a provider fails, the result
+  is `{rates, errors}`, retaining successful rates and identifying failures by
+  provider. Only a complete failure sets `isError`. Retry only failed providers.
+  The legacy `providers` alias still works but cannot be combined with `provider`.
 - **`list_currencies`** — supported currency, precious metal and crypto asset
-  codes and names as `{ code: name }`.
+  codes and names as `{ code: name }`. Optional `query` matches a code or name
+  fragment, case-insensitively, including historical currencies.
 - **`list_providers`** — the institutions relayed, with key, rate type,
-  frequency and coverage dates, to pick a `provider`.
+  frequency and coverage dates, to pick a `provider`. Filter by `query` (key/name
+  fragment), `country` (country code), or `currency` (supported code, including
+  the provider's base). Filters combine and ignore case.
+
+Exact currency codes and provider keys take priority over substring matches.
+
+All results use compact JSON. Discovery without filters still returns the full catalogue;
+use filters to keep agent context small. No matches returns `{}` for currencies or `[]`
+for providers.
 
 For time series, historical ranges, or bulk queries, use the REST API at
 `https://api.frankfurter.dev/v2` directly.

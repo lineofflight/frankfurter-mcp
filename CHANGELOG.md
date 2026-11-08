@@ -6,6 +6,24 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.6.0]
+
+### Added
+
+- Currency and provider discovery filters.
+- Optional conversion rate and effective-date details.
+
+### Changed
+
+- Compact JSON tool responses and shorter agent instructions.
+- `provider` as the single advertised provider selector; `providers` remains compatible.
+
+### Fixed
+
+- Preserve successful rates when another provider fails.
+- Reject conflicting or unknown rate arguments and deduplicate provider keys.
+- Remove obsolete inverse-rate guidance for small conversions.
+
 ## [0.5.5]
 
 ### Changed

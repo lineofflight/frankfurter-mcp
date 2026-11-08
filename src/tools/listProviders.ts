@@ -1,4 +1,5 @@
 import type { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
+import { z } from "zod";
 import type { FrankfurterClient } from "../frankfurter.js";
 import type { Provider } from "../types.js";
 
@@ -37,15 +38,45 @@ export function registerListProviders(server: McpServer, client: FrankfurterClie
     {
       title: "List providers",
       description:
-        "List the institutions whose rates Frankfurter relays, with key, rate type, frequency (daily, weekly, monthly or quarterly) and coverage dates. Use a key as `provider` in `convert` or `get_rates` for that institution's published rates instead of the blend.",
+        "Find rate providers with keys, rate types, base currencies, frequency and coverage dates. Filters combine; omit for all. Use a key as provider in convert or get_rates.",
       annotations: { readOnlyHint: true, openWorldHint: true },
-      inputSchema: {},
+      inputSchema: {
+        query: z
+          .string()
+          .trim()
+          .min(1)
+          .optional()
+          .describe("Key or name fragment, case-insensitive. Exact keys take priority."),
+        country: z
+          .string()
+          .trim()
+          .regex(/^[A-Za-z]{2}$/)
+          .optional()
+          .describe("Country code, e.g. US."),
+        currency: z
+          .string()
+          .trim()
+          .regex(/^[A-Za-z0-9]{3,5}$/)
+          .optional()
+          .describe("Supported currency code, including the provider's base."),
+      },
     },
-    async () => {
+    async ({ query, country, currency }) => {
       try {
         const providers = await client.getProviders();
+        const exact = providers.find((p) => p.key.toLowerCase() === query?.toLowerCase());
+        const matches = (exact ? [exact] : providers).filter(
+          (p) =>
+            (!query ||
+              p.key.toLowerCase().includes(query.toLowerCase()) ||
+              p.name.toLowerCase().includes(query.toLowerCase())) &&
+            (!country || p.country_code?.toUpperCase() === country.toUpperCase()) &&
+            (!currency ||
+              p.pivot_currency?.toUpperCase() === currency.toUpperCase() ||
+              p.currencies.some((code) => code.toUpperCase() === currency.toUpperCase())),
+        );
         return {
-          content: [{ type: "text" as const, text: JSON.stringify(summarize(providers), null, 2) }],
+          content: [{ type: "text" as const, text: JSON.stringify(summarize(matches)) }],
         };
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
