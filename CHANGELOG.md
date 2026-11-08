@@ -6,6 +6,18 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.5.5]
+
+### Changed
+
+- An unknown currency code now errors with
+  `invalid currency: MATIC. Call list_currencies for supported codes.`, and
+  an unknown provider key with
+  `unknown provider: IRS. Call list_providers for keys.`, instead of the raw
+  upstream status and body. A bad provider key used to come back as a bare
+  404 that didn't say what was wrong.
+- `convert`'s `from` description says to call `list_currencies` if unsure.
+
 ## [0.5.4]
 
 ### Changed

@@ -22,7 +22,7 @@ export class FrankfurterClient {
     const res = await fetch(url, { headers: { accept: "application/json" } });
     if (!res.ok) {
       const body = await res.text();
-      throw new Error(`Frankfurter API ${res.status}: ${body.slice(0, 200)}`);
+      throw new Error(ratesError(res.status, body, params.provider));
     }
     return (await res.json()) as RateRecord[];
   }
@@ -46,4 +46,17 @@ export class FrankfurterClient {
     }
     return (await res.json()) as Currency[];
   }
+}
+
+// Agents act on error text, so the two mistakes they make most, an unknown code and
+// an unknown provider key, name the tool that lists the valid ones.
+function ratesError(status: number, body: string, provider?: string): string {
+  const code = body.match(/invalid currency: ([A-Za-z0-9]+)/);
+  if (status === 422 && code) {
+    return `invalid currency: ${code[1]}. Call list_currencies for supported codes.`;
+  }
+  if (status === 404 && provider) {
+    return `unknown provider: ${provider.toUpperCase()}. Call list_providers for keys.`;
+  }
+  return `Frankfurter API ${status}: ${body.slice(0, 200)}`;
 }

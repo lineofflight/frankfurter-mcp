@@ -13,7 +13,9 @@ export const convertShape = {
     .describe(
       "Amount in the source currency. Normalize localized input first: '100,50' -> 100.5; German '1.000,50' -> 1000.5; English '1,000.50' -> 1000.5.",
     ),
-  from: CODE.describe("Source currency or asset code, e.g. USD, XAU or BTC."),
+  from: CODE.describe(
+    "Source currency or asset code, e.g. USD, XAU or BTC. Call list_currencies if unsure.",
+  ),
   to: CODE.describe("Target currency or asset code."),
   date: DATE.optional().describe("Date YYYY-MM-DD for a past rate; omit for latest."),
   provider: z
