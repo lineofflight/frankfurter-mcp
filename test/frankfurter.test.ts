@@ -50,6 +50,30 @@ test("throws with status and body on non-2xx", async () => {
   await expect(c.getRates({})).rejects.toThrow(/404/);
 });
 
+test("points an unknown currency at list_currencies", async () => {
+  server.use(
+    http.get(`${BASE}/v2/rates`, () =>
+      HttpResponse.json({ status: 422, message: "invalid currency: MATIC" }, { status: 422 }),
+    ),
+  );
+  const c = new FrankfurterClient(BASE);
+  await expect(c.getRates({ base: "MATIC" })).rejects.toThrow(
+    "invalid currency: MATIC. Call list_currencies for supported codes.",
+  );
+});
+
+test("points an unknown provider key at list_providers", async () => {
+  server.use(
+    http.get(`${BASE}/v2/providers/:key/rates`, () =>
+      HttpResponse.json({ status: 404, message: "not found" }, { status: 404 }),
+    ),
+  );
+  const c = new FrankfurterClient(BASE);
+  await expect(c.getRates({ provider: "irs", base: "USD" })).rejects.toThrow(
+    "unknown provider: IRS. Call list_providers for keys.",
+  );
+});
+
 test("routes a provider to its own rates path, key lowercased, other params intact", async () => {
   const c = new FrankfurterClient(BASE);
   const out = await c.getRates({
