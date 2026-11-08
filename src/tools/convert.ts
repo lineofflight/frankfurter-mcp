@@ -10,12 +10,8 @@ const CODE = z.string().regex(/^[A-Za-z0-9]{3,5}$/, "expected a 3 to 5 character
 export const convertShape = {
   amount: z
     .number()
-    .describe(
-      "Amount in the source currency. Normalize localized input first: '100,50' -> 100.5; German '1.000,50' -> 1000.5; English '1,000.50' -> 1000.5.",
-    ),
-  from: CODE.describe(
-    "Source currency or asset code, e.g. USD, XAU or BTC. Call list_currencies if unsure.",
-  ),
+    .describe("Numeric amount in the source currency; normalize localized input first."),
+  from: CODE.describe("Source currency or asset code, e.g. USD, XAU or BTC."),
   to: CODE.describe("Target currency or asset code."),
   date: DATE.optional().describe("Date YYYY-MM-DD for a past rate; omit for latest."),
   provider: z
@@ -23,9 +19,11 @@ export const convertShape = {
     .min(2)
     .max(8)
     .optional()
-    .describe(
-      "Provider key, e.g. ECB for European Central Bank or UST for U.S. Treasury reporting rates. Serves that institution's published rates instead of the blend; a date inside a weekly, monthly or quarterly provider's period returns the rate in force. Keys at https://frankfurter.dev/providers/.",
-    ),
+    .describe("Institution's key, e.g. ECB or UST; omit for blended rates."),
+  details: z
+    .boolean()
+    .optional()
+    .describe("Include rate, effective date and provider if selected. Default false."),
 };
 
 export interface ConvertArgs {
@@ -34,13 +32,16 @@ export interface ConvertArgs {
   to: string;
   date?: string;
   provider?: string;
+  details?: boolean;
 }
 
-// A money object: the converted value and its currency. Nothing else — for the
-// rate, date, or provenance, use get_rates.
+// Metadata is opt-in so ordinary conversions keep their small response.
 export interface ConvertResult {
   amount: number;
   currency: string;
+  rate?: number;
+  date?: string | null;
+  provider?: string;
 }
 
 export async function runConvert(
@@ -51,7 +52,11 @@ export async function runConvert(
   const to = args.to.toUpperCase();
 
   if (from === to) {
-    return { amount: roundMoney(args.amount, to), currency: to };
+    return {
+      amount: roundMoney(args.amount, to),
+      currency: to,
+      ...(args.details ? { rate: 1, date: null } : {}),
+    };
   }
 
   const records = await client.getRates({
@@ -67,7 +72,17 @@ export async function runConvert(
       `No rate available for ${from}->${to}${where}${args.date ? ` on ${args.date}` : ""}.`,
     );
   }
-  return { amount: roundMoney(args.amount * record.rate, to), currency: to };
+  return {
+    amount: roundMoney(args.amount * record.rate, to),
+    currency: to,
+    ...(args.details
+      ? {
+          rate: record.rate,
+          date: record.date,
+          ...(args.provider ? { provider: args.provider.toUpperCase() } : {}),
+        }
+      : {}),
+  };
 }
 
 export function registerConvert(server: McpServer, client: FrankfurterClient): void {
@@ -76,14 +91,14 @@ export function registerConvert(server: McpServer, client: FrankfurterClient): v
     {
       title: "Convert currency",
       description:
-        "Convert an amount from one currency to another. Returns {amount, currency} rounded to the target's minor units. Upstream rounds rates per direction; for low-value sources, flip via `get_rates` for more precision. Pass `provider` to use one institution's published rate, e.g. UST for a U.S. Treasury reporting rate.",
+        "Convert money using a reference rate. Returns {amount,currency}, rounded to the target's minor units (8 significant figures for metals/crypto). Set details for the rate and effective date too; identity conversions have rate 1 and date null.",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: convertShape,
     },
     async (args: ConvertArgs) => {
       try {
         const out = await runConvert(args, client);
-        return { content: [{ type: "text" as const, text: JSON.stringify(out, null, 2) }] };
+        return { content: [{ type: "text" as const, text: JSON.stringify(out) }] };
       } catch (e) {
         const msg = e instanceof Error ? e.message : String(e);
         return { content: [{ type: "text" as const, text: `Error: ${msg}` }], isError: true };

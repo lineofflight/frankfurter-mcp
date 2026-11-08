@@ -40,21 +40,34 @@ server.json         # MCP registry manifest (remote server, root URL)
 ## Tools
 
 - `convert` — the primary tool. Convert an amount between two currencies.
-  Returns a money object `{ amount, currency }` and nothing else; pass `date`
+  Returns a money object `{ amount, currency }` by default; pass `date`
   for a historical rate, `provider` for one institution's published rate.
+  `details: true` includes the direct rate, effective date and selected provider;
+  identity conversions return rate 1 and date null. Direct upstream rates already
+  preserve precision for tiny values; do not invert pairs.
   Rounded to the target's ISO minor units, or 8 significant figures for
   metals, crypto and other unknown-precision codes. Codes run three to five
   letters or digits, so crypto assets like `USDT` fit.
 - `get_rates` — blended reference rates for the latest day or a single `date`.
-  Optional `base`, `quotes` and `provider` / `providers`. The raw-rate companion
+  Optional `base`, `quotes` and `provider` (one key or an array). Only `provider`
+  is advertised; the legacy `providers` alias is still validated at runtime.
+  Passing both aliases errors. Always filter quotes when known. Successful
+  calls return arrays; provider failures return `{rates, errors}` preserving
+  successes, with `isError` only when all provider requests fail. The raw-rate companion
   behind a conversion. `provider` routes to `/v2/providers/{key}/rates`: one or
   more institutions' rates as published, never blended, with carry-forward
   across a weekly, monthly or quarterly provider's period.
 - `list_currencies` — supported currency, precious metal and crypto asset
-  codes and names as `{ code: name }`.
+  codes and names as `{ code: name }`. Optional `query` filters by code/name
+  fragment, case-insensitively; no matches returns `{}`.
 - `list_providers` — the institutions relayed, trimmed to key, name, country,
   rate type, pivot, frequency, coverage dates and a currency count. The
-  per-provider currency list is left out of the payload.
+  per-provider currency list is left out of the payload. Optional `query`
+  (key/name fragment), `country` (country code), and `currency` (supported code,
+  including pivot) combine with AND, ignoring case. No matches returns `[]`.
+
+Exact currency codes and provider keys take priority over substring matches.
+All JSON tool results are compact. Full catalogue defaults remain available.
 
 For time series, historical ranges, or bulk queries, use the REST API at
 `https://api.frankfurter.dev/v2` directly.

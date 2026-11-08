@@ -12,7 +12,7 @@ async function connect(fc: FrankfurterClient): Promise<Client> {
   return client;
 }
 
-test("get_rates input accepts base, date, quotes, provider, and providers", async () => {
+test("get_rates advertises base, date, quotes, and provider", async () => {
   const fc = new FrankfurterClient("https://api.test");
   vi.spyOn(fc, "getRates").mockResolvedValue([]);
   const client = await connect(fc);
@@ -20,7 +20,7 @@ test("get_rates input accepts base, date, quotes, provider, and providers", asyn
   const { tools } = await client.listTools();
   const getRates = tools.find((t) => t.name === "get_rates");
   const props = Object.keys(getRates?.inputSchema.properties ?? {}).sort();
-  expect(props).toEqual(["base", "date", "provider", "providers", "quotes"]);
+  expect(props).toEqual(["base", "date", "provider", "quotes"]);
 });
 
 test("get_rates relays the records for a single date", async () => {
