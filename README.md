@@ -27,7 +27,9 @@ over Frankfurter's v2 blended multi-source reference rates.
 - **`list_providers`** — the institutions relayed, with key, rate type,
   frequency and coverage dates, to pick a `provider`. Filter by `query` (key/name
   fragment), `country` (country code), or `currency` (supported code, including
-  the provider's base). Filters combine and ignore case.
+  the provider's base). Filters combine and ignore case. A provider that
+  publishes several series also lists its `datasets`; pass a dataset key such as
+  `NBP.B` as `provider` to select one.
 
 Exact currency codes and provider keys take priority over substring matches.
 

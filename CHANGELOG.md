@@ -6,6 +6,15 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+### Added
+
+- Dataset keys such as `NBP.B` as `provider`.
+- `datasets` in `list_providers` for providers that publish several series.
+
+### Changed
+
+- The API's reason when it refuses a base, such as one the provider never quotes.
+
 ## [0.6.0]
 
 ### Added

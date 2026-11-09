@@ -8,7 +8,7 @@ const DATE = z.string().regex(/^\d{4}-\d{2}-\d{2}$/, "expected YYYY-MM-DD");
 const CODE = z.string().regex(/^[A-Za-z0-9]{3,5}$/, "expected a 3 to 5 character code");
 const PROVIDERS = z.preprocess(
   (v) => (typeof v === "string" ? [v] : v),
-  z.array(z.string().min(2).max(8)),
+  z.array(z.string().min(2).max(16)),
 );
 
 export const getRatesShape = {
@@ -20,7 +20,7 @@ export const getRatesShape = {
     .optional()
     .describe("Requested currency codes. Supply whenever known; omit only to request all."),
   provider: PROVIDERS.optional().describe(
-    "Institution keys, e.g. ['ECB','HMRC']; omit for blended rates.",
+    "Provider or dataset keys, e.g. ['ECB','NBP.B']; omit for blended rates.",
   ),
 };
 

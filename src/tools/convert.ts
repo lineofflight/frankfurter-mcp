@@ -17,9 +17,9 @@ export const convertShape = {
   provider: z
     .string()
     .min(2)
-    .max(8)
+    .max(16)
     .optional()
-    .describe("Institution's key, e.g. ECB or UST; omit for blended rates."),
+    .describe("Provider or dataset key, e.g. ECB or NBP.B; omit for blended rates."),
   details: z
     .boolean()
     .optional()

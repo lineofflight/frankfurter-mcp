@@ -49,14 +49,29 @@ export class FrankfurterClient {
 }
 
 // Agents act on error text, so the two mistakes they make most, an unknown code and
-// an unknown provider key, name the tool that lists the valid ones.
+// an unknown provider key, name the tool that lists the valid ones. Other refusals
+// relay the API's own reason, such as a base the provider never quotes.
 function ratesError(status: number, body: string, provider?: string): string {
   const code = body.match(/invalid currency: ([A-Za-z0-9]+)/);
   if (status === 422 && code) {
     return `invalid currency: ${code[1]}. Call list_currencies for supported codes.`;
   }
+  if (status === 422) {
+    const message = apiMessage(body);
+    if (message) return message;
+  }
   if (status === 404 && provider) {
     return `unknown provider: ${provider.toUpperCase()}. Call list_providers for keys.`;
   }
   return `Frankfurter API ${status}: ${body.slice(0, 200)}`;
+}
+
+function apiMessage(body: string): string | undefined {
+  try {
+    const parsed: unknown = JSON.parse(body);
+    const message = (parsed as { message?: unknown } | null)?.message;
+    return typeof message === "string" ? message : undefined;
+  } catch {
+    return undefined;
+  }
 }

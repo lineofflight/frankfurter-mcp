@@ -36,4 +36,14 @@ export interface Provider {
   frequency?: "daily" | "weekly" | "monthly" | "quarterly";
   publishes_missed?: number | null;
   currencies: string[];
+  datasets?: Dataset[];
+}
+
+// A provider's rate series. A provider key selects its default datasets; a dataset key such as
+// NBP.B selects one.
+export interface Dataset {
+  key: string;
+  default: boolean;
+  frequency?: "daily" | "weekly" | "monthly" | "quarterly";
+  currencies: string[];
 }

@@ -65,6 +65,10 @@ server.json         # MCP registry manifest (remote server, root URL)
   per-provider currency list is left out of the payload. Optional `query`
   (key/name fragment), `country` (country code), and `currency` (supported code,
   including pivot) combine with AND, ignoring case. No matches returns `[]`.
+  A provider that publishes several series also lists its `datasets` (key,
+  default flag, frequency, currency count). A dataset key such as `NBP.B` works
+  as `provider` in `convert` and `get_rates`; a provider key selects its default
+  datasets.
 
 Exact currency codes and provider keys take priority over substring matches.
 All JSON tool results are compact. Full catalogue defaults remain available.

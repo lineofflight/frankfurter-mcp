@@ -16,7 +16,15 @@ export type ProviderSummary = Pick<
   | "frequency"
   | "start_date"
   | "end_date"
-> & { currencies: number };
+> & { currencies: number; datasets?: DatasetSummary[] };
+
+// Listed only for a provider that publishes several series, whose keys select them one at a time.
+export interface DatasetSummary {
+  key: string;
+  default: boolean;
+  frequency: string;
+  currencies: number;
+}
 
 export function summarize(providers: Provider[]): ProviderSummary[] {
   return providers.map((p) => ({
@@ -29,6 +37,16 @@ export function summarize(providers: Provider[]): ProviderSummary[] {
     start_date: p.start_date ?? null,
     end_date: p.end_date ?? null,
     currencies: p.currencies.length,
+    ...((p.datasets?.length ?? 0) > 1
+      ? {
+          datasets: (p.datasets ?? []).map((d) => ({
+            key: d.key,
+            default: d.default,
+            frequency: d.frequency ?? "daily",
+            currencies: d.currencies.length,
+          })),
+        }
+      : {}),
   }));
 }
 
@@ -38,7 +56,7 @@ export function registerListProviders(server: McpServer, client: FrankfurterClie
     {
       title: "List providers",
       description:
-        "Find rate providers with keys, rate types, base currencies, frequency and coverage dates. Filters combine; omit for all. Use a key as provider in convert or get_rates.",
+        "Find rate providers with keys, rate types, base currencies, frequency and coverage dates. Filters combine; omit for all. Use a key as provider in convert or get_rates; a provider publishing several series lists datasets, whose keys select one.",
       annotations: { readOnlyHint: true, openWorldHint: true },
       inputSchema: {
         query: z
