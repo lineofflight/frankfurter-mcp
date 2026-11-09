@@ -74,6 +74,27 @@ test("points an unknown provider key at list_providers", async () => {
   );
 });
 
+test("relays the API's reason for refusing a base", async () => {
+  server.use(
+    http.get(`${BASE}/v2/providers/:key/rates`, () =>
+      HttpResponse.json(
+        { status: 422, message: "NBP.B doesn't quote EUR; try base=PLN" },
+        { status: 422 },
+      ),
+    ),
+  );
+  const c = new FrankfurterClient(BASE);
+  await expect(c.getRates({ provider: "NBP.B" })).rejects.toThrow(
+    /^NBP\.B doesn't quote EUR; try base=PLN$/,
+  );
+});
+
+test("routes a dataset key to its provider rates path", async () => {
+  const c = new FrankfurterClient(BASE);
+  await c.getRates({ provider: "CBIC.EXPORT", base: "INR" });
+  expect(new URL(lastUrl).pathname).toBe("/v2/providers/cbic.export/rates");
+});
+
 test("routes a provider to its own rates path, key lowercased, other params intact", async () => {
   const c = new FrankfurterClient(BASE);
   const out = await c.getRates({

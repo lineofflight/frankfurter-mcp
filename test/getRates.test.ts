@@ -120,3 +120,23 @@ test("get_rates accepts an array under provider as well", async () => {
   expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "ECB" }));
   expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "HMRC" }));
 });
+
+test("get_rates and convert accept dataset keys longer than a provider key", async () => {
+  const fc = new FrankfurterClient("https://api.test");
+  const spy = vi
+    .spyOn(fc, "getRates")
+    .mockResolvedValue([{ date: "2026-11-09", base: "USD", quote: "INR", rate: 88.1 }]);
+  const client = await connect(fc);
+
+  const rates = await client.callTool({
+    name: "get_rates",
+    arguments: { provider: "CBIC.EXPORT", base: "USD", quotes: ["INR"] },
+  });
+  expect(rates.isError).toBeFalsy();
+  const converted = await client.callTool({
+    name: "convert",
+    arguments: { amount: 1, from: "USD", to: "INR", provider: "CBIC.EXPORT" },
+  });
+  expect(converted.isError).toBeFalsy();
+  expect(spy).toHaveBeenCalledWith(expect.objectContaining({ provider: "CBIC.EXPORT" }));
+});

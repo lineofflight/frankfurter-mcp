@@ -45,3 +45,47 @@ test("list_providers returns a trimmed summary per provider", async () => {
     },
   ]);
 });
+
+test("list_providers lists the datasets of a provider that publishes several", async () => {
+  const fc = new FrankfurterClient("https://api.test");
+  const dataset = (key: string, frequency: "daily" | "weekly", currencies: string[]) => ({
+    key,
+    default: true,
+    frequency,
+    currencies,
+  });
+  vi.spyOn(fc, "getProviders").mockResolvedValue([
+    {
+      key: "NBP",
+      name: "Narodowy Bank Polski",
+      pivot_currency: "PLN",
+      frequency: "daily",
+      currencies: ["AFN", "EUR", "PLN", "USD"],
+      datasets: [
+        dataset("NBP.A", "daily", ["EUR", "PLN", "USD"]),
+        dataset("NBP.B", "weekly", ["AFN", "PLN"]),
+      ],
+    },
+    {
+      key: "ECB",
+      name: "European Central Bank",
+      pivot_currency: "EUR",
+      frequency: "daily",
+      currencies: ["EUR", "USD"],
+      datasets: [dataset("ECB", "daily", ["EUR", "USD"])],
+    },
+  ]);
+  const server = createMcpServer(fc);
+
+  const [clientT, serverT] = InMemoryTransport.createLinkedPair();
+  const client = new Client({ name: "t", version: "0" });
+  await Promise.all([server.connect(serverT), client.connect(clientT)]);
+
+  const res = await client.callTool({ name: "list_providers", arguments: {} });
+  const [nbp, ecb] = JSON.parse((res.content as Array<{ type: string; text: string }>)[0].text);
+  expect(nbp.datasets).toEqual([
+    { key: "NBP.A", default: true, frequency: "daily", currencies: 3 },
+    { key: "NBP.B", default: true, frequency: "weekly", currencies: 2 },
+  ]);
+  expect(ecb).not.toHaveProperty("datasets");
+});
