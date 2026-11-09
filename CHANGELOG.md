@@ -6,6 +6,8 @@ All notable changes to this project are documented here. The format follows
 
 ## [Unreleased]
 
+## [0.7.0]
+
 ### Added
 
 - Dataset keys such as `NBP.B` as `provider`.
